@@ -1,0 +1,19 @@
+
+@import url('~@jupyterlab/filebrowser/style/index.css');
+
+.jp-ApplicationShell[data-theme-light='true'] ~ .p-Menu .jp-openbayes-icon {
+    background-image: url(openbayes_dataset.png);
+}
+.jp-ApplicationShell[data-theme-light='false'] ~ .p-Menu .jp-openbayes-icon {
+    background-image: url(openbayes_dataset.png);
+}
+
+/**
+* Choose the google drive icon depending on the theme.
+*/
+[data-jp-theme-light='true'] .jp-openbayes-icon {
+    background-image: url(openbayes_dataset.png);
+}
+[data-jp-theme-light='false'] .jp-openbayes-icon {
+    background-image: url(openbayes_dataset.png);
+}
