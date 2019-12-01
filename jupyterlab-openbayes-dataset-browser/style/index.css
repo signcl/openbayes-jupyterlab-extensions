@@ -1,0 +1,113 @@
+:root {
+    --indent: 1em;
+    --datasetbrowser-icon-light: url('dataset-browser-light.svg');
+    --datasetbrowser-icon-dark: url('dataset-browser-dark.svg');
+    --datasetbrowser-icon: var(--datasetbrowser-icon-dark);
+}
+
+[data-jp-theme-light="true"] .datasetbrowser-icon {
+    --datasetbrowser-icon: var(--datasetbrowser-icon-light);
+}
+[data-jp-theme-light="false"] .datasetbrowser-icon {
+    --datasetbrowser-icon: var(--datasetbrowser-icon-dark);
+}
+
+.jp-datasetbrowser-widget {
+    background: var(--jp-layout-color1);
+    overflow: scroll;
+    color: var(--jp-ui-font-color1);
+    /* This is needed so that all font sizing of children done in ems is
+     * relative to this base size */
+    font-size: var(--jp-ui-font-size1);
+}
+
+.jp-datasetbrowser-widget header {
+    border-bottom: var(--jp-border-width) solid var(--jp-border-color2);
+    flex: 0 0 auto;
+    font-size: var(--jp-ui-font-size0);
+    font-weight: 600;
+    letter-spacing: 1px;
+    margin: 0px;
+    padding: 8px 12px;
+    text-transform: uppercase;
+}
+
+.datasetbrowser-toolbar {
+    padding: 0px;
+    border-bottom: none;
+    height: auto;
+    margin: var(--jp-toolbar-header-margin);
+    box-shadow: none;
+}
+.datasetbrowser-toolbar .jp-ToolbarButtonComponent {
+    padding: 0px 16px;
+}
+
+.datasetbrowser-icon {
+    background-image: var(--datasetbrowser-icon);
+    min-width: 16px;
+    min-height: 16px;
+    background-size: 16px;
+    display: inline-block;
+    vertical-align: middle;
+    background-repeat: no-repeat;
+    background-position: center;
+    margin: auto;
+}
+
+.datasetbrowser-head {
+    width: 100%;
+    border-spacing: 0px;
+    overflow: scroll;
+}
+
+.datasetbrowser-item-name {
+    padding-left: var(--indent);
+    padding-right: 10px; /* fixes overlap into next column*/
+    display: flex;
+}
+
+.datasetbrowser-attribute {
+    text-align: right;
+    padding-right: 10px;
+}
+
+.datasetbrowser-item {
+    -webkit-user-select: none;  /* Chrome all / Safari all */
+    -moz-user-select: none;     /* Firefox all */
+    -ms-user-select: none;      /* IE 10+ */
+    text-align: center;
+    padding-top: 2px;
+    overflow: hidden;
+    white-space: nowrap;
+}
+
+.datasetbrowser-item:hover {
+    cursor: pointer;
+    background-color: var(--jp-input-hover-background);
+}
+
+.datasetbrowser-item.selected {
+    color: white;
+    background: var(--jp-brand-color1);
+}
+
+.datasetbrowser-header {
+    -webkit-user-select: none;  /* Chrome all / Safari all */
+    -moz-user-select: none;     /* Firefox all */
+    -ms-user-select: none;      /* IE 10+ */
+    border: var(--jp-border-width) solid var(--jp-border-color2);
+    border-left: none;
+    padding: 4px 12px;
+    font-weight: 500;
+    flex: 1 0 84px;
+    text-transform: unset;
+    overflow: hidden;
+    white-space: nowrap;
+}
+.datasetbrowser-header.modified {
+    padding: 4px 12px;
+    font-weight: 500;
+    flex: 0 0 112px;
+    text-align: right;
+}
