@@ -5,6 +5,10 @@
 - [dataset-browser](https://github.com/signcl/openbayes-jupyterlab-extensions/tree/master/jupyterlab-openbayes-dataset-browser)
 
 	`$ jupyter labextension install jupyterlab-openbayes-dataset-browser`
+	
+- [introduction](https://github.com/signcl/openbayes-jupyterlab-extensions/tree/master/jupyterlab-openbayes-introduction)
+
+	`$ jupyter labextension install jupyterlab-openbayes-introduction`
 
 - [openbayes-theme](https://github.com/signcl/openbayes-jupyterlab-extensions/tree/master/jupyterlab-openbayes-theme])
 
