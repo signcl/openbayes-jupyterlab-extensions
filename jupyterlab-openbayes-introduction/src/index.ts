@@ -20,12 +20,16 @@ import {
   Menu
 } from '@phosphor/widgets'
 
+import {
+  IStateDB
+} from '@jupyterlab/coreutils';
+
 import '../style/index.css';
 
 const extension: JupyterFrontEndPlugin<void> = {
   id: 'jupyterlab-openbayes-introduction',
   autoStart: true,
-  requires: [IMainMenu],
+  requires: [IMainMenu, IStateDB],
   optional: [IFileBrowserFactory, ICommandPalette],
   activate: activate_openbayes_menu
 };
@@ -47,13 +51,19 @@ namespace CommandIDs {
 export const OpenBayesTabs = [
   {
     id: CommandIDs.OpenIntro,
-    name: '关于',
+    name: '操作简介',
     path: 'intro/openbayes-intro.ipynb',
     target: Targets.OpenFile,
+  },
+  {
+    id: CommandIDs.OpenDoc,
+    name: '文档中心',
+    url: 'https://openbayes.com/docs/',
+    target: Targets.OpenWindow
   }
 ];
 
-export function activate_openbayes_menu(app: JupyterFrontEnd, mainMenu: IMainMenu): Promise<void>{
+export function activate_openbayes_menu(app: JupyterFrontEnd, mainMenu: IMainMenu, state: IStateDB): Promise<void>{
 
   const {commands} = app;
 
@@ -98,10 +108,20 @@ export function activate_openbayes_menu(app: JupyterFrontEnd, mainMenu: IMainMen
 
   let menu:Menu = new Menu({commands});
   menu.title.label = 'OpenBayes';
-  OpenBayesTabs.forEach(item => menu.addItem({command: `${item.id}`}));
-  mainMenu.addMenu(menu, {rank: 80});
+  for (const tabItem of OpenBayesTabs) {
+    menu.addItem({command: `${tabItem.id}`});
+    menu.addItem({ type: 'separator' });
+  }
+  mainMenu.addMenu(menu, {rank: 2000});
 
-  void app.commands.execute(CommandIDs.OpenIntro);
+  const stateID = 'openbayes-open-introduction-state';
+  state.fetch(stateID).then((res) => {
+    if (res != stateID) {
+      void app.commands.execute(CommandIDs.OpenIntro);
+      state.save(stateID, stateID).then();
+    }
+  });
 
   return Promise.resolve(void 0);
 }
+
