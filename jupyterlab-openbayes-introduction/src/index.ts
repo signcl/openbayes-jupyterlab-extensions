@@ -1,42 +1,107 @@
 import {
   JupyterFrontEnd,
-  JupyterFrontEndPlugin,
+  JupyterFrontEndPlugin
 } from '@jupyterlab/application';
 
 import {
   IFileBrowserFactory,
 } from '@jupyterlab/filebrowser';
 
-/**
- * Initialization data for the jupyterlab-openbayes-introduction extension.
- */
+import {
+  IMainMenu
+} from '@jupyterlab/mainmenu'
 
-const intro_path = 'intro/openbayes-intro.ipynb';
+import {
+  IFrame,
+  ICommandPalette
+} from '@jupyterlab/apputils'
 
-namespace CommandIDs {
-  export const openIntro = 'openbayes:open-intro'
-  export const openPath = 'filebrowser:open-path';
-}
+import {
+  Menu
+} from '@phosphor/widgets'
+
+import '../style/index.css';
 
 const extension: JupyterFrontEndPlugin<void> = {
   id: 'jupyterlab-openbayes-introduction',
   autoStart: true,
-  requires: [IFileBrowserFactory],
-  activate: (app: JupyterFrontEnd,) => {
-
-    const {commands} = app;
-
-    commands.addCommand(CommandIDs.openIntro, {
-      label: 'About OpenBayes',
-      caption: 'OpenBayes Introduction',
-      execute: () => {
-        void commands.execute(CommandIDs.openPath, { path: intro_path });
-      }
-    });
-
-    void commands.execute(CommandIDs.openIntro);
-
-  }
+  requires: [IMainMenu],
+  optional: [IFileBrowserFactory, ICommandPalette],
+  activate: activate_openbayes_menu
 };
 
 export default extension;
+
+namespace Targets {
+  export const OpenFile = 'open_file';
+  export const OpenWindow = 'open_window';
+  export const ShowInIFrame = 'iframe';
+}
+
+namespace CommandIDs {
+  export const OpenPath = 'filebrowser:open-path';
+  export const OpenIntro = 'openbayes:open-intro:show';
+  export const OpenDoc = 'openbayes:open-doc:show';
+}
+
+export const OpenBayesTabs = [
+  {
+    id: CommandIDs.OpenIntro,
+    name: '关于',
+    path: 'intro/openbayes-intro.ipynb',
+    target: Targets.OpenFile,
+  }
+];
+
+export function activate_openbayes_menu(app: JupyterFrontEnd, mainMenu: IMainMenu): Promise<void>{
+
+  const {commands} = app;
+
+  function appendNewCommand(item: any) {
+    let iframe: IFrame = null;
+    let command = `${item.id}`;
+    commands.addCommand(command, {
+      label: item.name,
+      execute: () => {
+        if (item.target == Targets.OpenFile) {
+
+          void app.commands.execute(CommandIDs.OpenPath, { path: item.path });
+
+        } else if (item.target == Targets.OpenWindow) {
+
+          let win = window.open(item.url, '_blank');
+          win.focus();
+
+        } else if (item.target == Targets.ShowInIFrame) {
+          if (!iframe) {
+            iframe = new IFrame();
+            iframe.url = item.url;
+            iframe.id = item.name;
+            iframe.title.label = item.name;
+            iframe.title.closable = true;
+            iframe.node.style.overflowY = 'auto';
+          }
+
+          if (iframe == null || !iframe.isAttached) {
+            app.shell.add(iframe, 'main');
+            app.shell.activateById(iframe.id);
+          } else {
+            app.shell.activateById(iframe.id);
+          }
+        }
+
+      }
+    });
+  }
+
+  OpenBayesTabs.forEach(item => appendNewCommand(item));
+
+  let menu:Menu = new Menu({commands});
+  menu.title.label = 'OpenBayes';
+  OpenBayesTabs.forEach(item => menu.addItem({command: `${item.id}`}));
+  mainMenu.addMenu(menu, {rank: 80});
+
+  void app.commands.execute(CommandIDs.OpenIntro);
+
+  return Promise.resolve(void 0);
+}
