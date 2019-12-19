@@ -52,7 +52,7 @@ export const OpenBayesTabs = [
   {
     id: CommandIDs.OpenIntro,
     name: '操作简介',
-    path: 'intro/openbayes-intro.ipynb',
+    path: 'home/openbayes-intro.ipynb',
     target: Targets.OpenFile,
   },
   {
