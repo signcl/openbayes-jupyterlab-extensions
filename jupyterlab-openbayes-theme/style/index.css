@@ -6,6 +6,9 @@
 @import './variables.css';
 @import './urls.css';
 
+/* OpenBayes mod */
+@import './openbayes.css';
+
 /* Set the default typography for monospace elements */
 tt,
 code,

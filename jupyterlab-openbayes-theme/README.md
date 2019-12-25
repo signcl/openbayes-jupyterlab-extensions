@@ -1,7 +1,6 @@
 # jupyterlab-openbayes-theme
 
-OpenBayes Theme
-
+OpenBayes Theme, a fork from official JupyterLab [dark theme](https://github.com/jupyterlab/jupyterlab/tree/master/packages/theme-dark-extension).
 
 ## Prerequisites
 
@@ -29,4 +28,3 @@ To rebuild the package and the JupyterLab app:
 npm run build
 jupyter lab build
 ```
-
