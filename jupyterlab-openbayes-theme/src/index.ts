@@ -19,7 +19,7 @@ const extension: JupyterFrontEndPlugin<void> = {
     const style = namespace + '/index.css';
     manager.register({
       name: 'OpenBayes Theme',
-      isLight: false,
+      isLight: true,
       themeScrollbars: true,
       load: () => manager.loadCSS(style),
       unload: () => Promise.resolve(undefined)
