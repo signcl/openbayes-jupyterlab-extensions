@@ -17,9 +17,15 @@ const extension: JupyterFrontEndPlugin<void> = {
   requires: [IThemeManager],
   activate: (app: JupyterFrontEnd, manager: IThemeManager) => {
     const style = namespace + '/index.css';
+
+    let isLight = true;
+    if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+      isLight = false;
+    }
+
     manager.register({
       name: 'OpenBayes Theme',
-      isLight: true,
+      isLight: isLight,
       themeScrollbars: true,
       load: () => manager.loadCSS(style),
       unload: () => Promise.resolve(undefined)
