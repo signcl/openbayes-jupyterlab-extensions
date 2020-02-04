@@ -1,0 +1,25 @@
+:root {
+    --indent: 1em;
+    --bindings-icon-light: url('openbayes-bindings-light.svg');
+    --bindings-icon-dark: url('openbayes-bindings-dark.svg');
+    --bindings-icon: var(--bindings-icon-dark);
+}
+
+[data-jp-theme-light="true"] .bindings-icon {
+    --bindings-icon: var(--bindings-icon-light);
+}
+[data-jp-theme-light="false"] .bindings-icon {
+    --bindings-icon: var(--bindings-icon-dark);
+}
+
+.bindings-icon {
+    background-image: var(--bindings-icon);
+    min-width: 16px;
+    min-height: 16px;
+    background-size: 16px;
+    display: inline-block;
+    vertical-align: middle;
+    background-repeat: no-repeat;
+    background-position: center;
+    margin: auto;
+}
