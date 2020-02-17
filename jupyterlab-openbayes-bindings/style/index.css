@@ -1,25 +1,116 @@
 :root {
-    --indent: 1em;
-    --bindings-icon-light: url('openbayes-bindings-light.svg');
-    --bindings-icon-dark: url('openbayes-bindings-dark.svg');
-    --bindings-icon: var(--bindings-icon-dark);
+  --indent: 1em;
+  --bindings-icon-light: url('openbayes-bindings-light.svg');
+  --bindings-icon-dark: url('openbayes-bindings-dark.svg');
+  --bindings-icon: var(--bindings-icon-dark);
+
+  --fontstack-monospace: Menlo, Consolas, monospace;
+
+  /* Color - text color */
+  --text-color-h: 238;
+  --text-color-s: 71%;
+  --text-color-l: 11%;
+  --text-color-hsl: var(--text-color-h), var(--text-color-s),
+    var(--text-color-l);
+  --text-color: hsl(var(--text-color-hsl));
+  --text-color-10: hsla(var(--text-color-hsl), 0.1);
+
+  /* Color - link color */
+  --link-color-h: 211;
+  --link-color-s: 100%;
+  --link-color-l: 50%;
+  --link-color-hsl: var(--link-color-h), var(--link-color-s),
+    var(--link-color-l);
+  --link-color: hsl(var(--link-color-hsl));
 }
 
-[data-jp-theme-light="true"] .bindings-icon {
-    --bindings-icon: var(--bindings-icon-light);
+[data-jp-theme-light='true'] .bindings-icon {
+  --bindings-icon: var(--bindings-icon-light);
 }
-[data-jp-theme-light="false"] .bindings-icon {
-    --bindings-icon: var(--bindings-icon-dark);
+[data-jp-theme-light='false'] .bindings-icon {
+  --bindings-icon: var(--bindings-icon-dark);
+}
+
+.bindings-setting-icon {
+  background-image: var(--bindings-icon);
 }
 
 .bindings-icon {
-    background-image: var(--bindings-icon);
-    min-width: 16px;
-    min-height: 16px;
-    background-size: 16px;
-    display: inline-block;
-    vertical-align: middle;
-    background-repeat: no-repeat;
-    background-position: center;
-    margin: auto;
+  background-image: var(--bindings-icon);
+  min-width: 16px;
+  min-height: 16px;
+  background-size: 16px;
+  display: inline-block;
+  vertical-align: middle;
+  background-repeat: no-repeat;
+  background-position: center;
+  margin: auto;
+}
+
+.bindings-widget {
+  background: var(--jp-layout-color1);
+  overflow: scroll;
+  color: var(--jp-ui-font-color1);
+  /* This is needed so that all font sizing of children done in ems is
+     * relative to this base size */
+  font-size: var(--jp-ui-font-size1);
+}
+
+.font-monospace {
+  font-family: var(--fontstack-monospace);
+}
+
+.dataset {
+  border: 1px solid var(--text-color-10);
+  border-radius: 4px;
+  padding: 10px;
+  margin-bottom: 1em;
+  word-break: break-word;
+}
+
+.nameWrap {
+  display: flex;
+  align-items: flex-start;
+}
+.nameWrap span {
+  width: 60px;
+  min-width: 60px;
+}
+
+.dataset-private {
+  display: block;
+  text-align: center;
+  font-size: 12px;
+  font-weight: bold;
+  padding: 2px 10px;
+  border-radius: 666px;
+  margin-right: 10px;
+  color: var(--text-color);
+  background: var(--text-color-10);
+  word-break: keep-all;
+  width: 100%;
+  background: var(--text-color-10);
+}
+
+.job-output {
+  display: block;
+  text-align: center;
+  font-size: 12px;
+  font-weight: bold;
+  padding: 2px 10px;
+  border-radius: 666px;
+  margin-right: 10px;
+  background: var(--text-color-10);
+  word-break: keep-all;
+  width: 100%;
+  color: #9b51e0;
+  background: hsla(271, 70%, 60%, 0.1);
+}
+
+.linkPath {
+  color: var(--link-color);
+}
+
+.linkPath hover {
+  cursor: pointer;
 }
