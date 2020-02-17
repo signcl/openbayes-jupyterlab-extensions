@@ -10,10 +10,13 @@
 
 	`$ jupyter labextension install jupyterlab-openbayes-introduction`
 
-- [openbayes-theme](https://github.com/signcl/openbayes-jupyterlab-extensions/tree/master/jupyterlab-openbayes-theme])
+- [openbayes-theme](https://github.com/signcl/openbayes-jupyterlab-extensions/tree/master/jupyterlab-openbayes-theme)
 
  	 `$ jupyter labextension install jupyterlab-openbayes-theme`
 
+- [bindings](https://github.com/signcl/openbayes-jupyterlab-extensions/tree/master/jupyterlab-openbayes-bindings)
+
+ 	 `$ jupyter labextension install jupyterlab-openbayes-bindings`
 
 ## 插件发布
  
@@ -72,20 +75,20 @@
 	jupyter lab build
 	```
 	
-- 安装 jupyterlab 扩展 (较 link .更为常用)
+- 安装 jupyterlab 扩展
 
 	```
 	(在相应的插件子目录中执行)
 	jupyter labextension install .
 	```
-	
-- 链接 jupyterlab 扩展 (较少用)
+
+- 链接 jupyterlab 扩展
 	
 	```
 	(在相应的插件子目录中执行)
 	jupyter labextension link .
 	```
-	
+ 
 ### 其他
 - 执行`conda init`命令，将会在终端中自动加载 conda 相关的东西 (如当前的虚拟环境)
 - `jupyter lab` 命令执行的目录将会成容器的工作空间 <br/>

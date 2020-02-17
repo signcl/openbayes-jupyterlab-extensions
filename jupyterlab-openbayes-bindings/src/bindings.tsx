@@ -1,20 +1,109 @@
-import * as React from 'react';
-import * as ReactDOM from "react-dom";
+import React from 'react'
 
-import { Widget } from '@phosphor/widgets';
+import {
+  DatasetBinding,
+  DatasetBindingTypeEnum,
+  JobOutputBinding,
+  JobOutputBindingTypeEnum
+} from './model'
+import { IProps } from './app'
 
-export const NAMESPACE = 'openbayes-bindings';
-
-export class BindingsWidget extends Widget {
-
-    constructor() {
-        super();
-
-        let tsx = (<h1> Bindings </h1>);
-
-        ReactDOM.render(tsx, this.node)
-    }
+export function BindingsComponent(props: IProps) {
+  if (props.bindings && props.bindings.length > 0) {
+    return bindingComponent(props.bindings, props.openInTerminal)
+  }
+  return noBindingComponent()
 }
 
+const noBindingComponent = () => {
+  return (
+    <div>
+      <div>暂无绑定数据集，请参考我们的帮助文档</div>
+      <div>
+        <a
+          className="linkPath"
+          target="_blank"
+          href="https://openbayes.com/docs/bayesgear/"
+        >
+          数据集绑定
+        </a>
+      </div>
+    </div>
+  )
+}
 
-
+const bindingComponent = (
+  bindings: Array<JobOutputBinding | DatasetBinding>,
+  openInTerminal?: (path: string) => void
+) => {
+  return (
+    <div>
+      {bindings.map((binding, i) => {
+        if (binding.type === DatasetBindingTypeEnum.DATASET) {
+          return (
+            <div key={i} className="dataset">
+              <div className="nameWrap">
+                <span className="dataset-private"> 数据集 </span>
+                <div className="font-monospace">
+                  <a
+                    className="linkPath"
+                    target="_blank"
+                    href={
+                      'https://stg.openbayes.com/console/' +
+                      `${binding.user_id}/datasets/${binding.dataset_id}/${binding.version}`
+                    }
+                  >
+                    {binding.name}
+                  </a>
+                </div>
+              </div>
+              <div className="font-monospace">
+                <span>终端：</span>
+                <span
+                  className="linkPath"
+                  onClick={() => {
+                    openInTerminal(`/openbayes/input${binding.path}`)
+                  }}
+                >
+                  /openbayes/input{binding.path}
+                </span>
+              </div>
+            </div>
+          )
+        } else if (binding.type === JobOutputBindingTypeEnum.OUTPUT) {
+          return (
+            <div key={i} className="dataset">
+              <div className="nameWrap">
+                <span className="job-output">输出</span>
+                <div className="font-monospace">
+                  <a
+                    className="linkPath"
+                    target="_blank"
+                    href={
+                      'https://stg.openbayes.com/console/' +
+                      `${binding.user_id}/jobs/${binding.job_id}/output`
+                    }
+                  >
+                    {binding.name}
+                  </a>
+                </div>
+              </div>
+              <div className="font-monospace">
+                <span>在终端打开：</span>
+                <span
+                  className="linkPath"
+                  onClick={() => {
+                    openInTerminal(`${binding.path}`)
+                  }}
+                >
+                  {binding.path}
+                </span>
+              </div>
+            </div>
+          )
+        }
+        return null
+      })}
+    </div>
+  )
+}
