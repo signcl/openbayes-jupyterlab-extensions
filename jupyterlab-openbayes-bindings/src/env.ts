@@ -12,8 +12,15 @@ function Env(url: string, token: string): IEnv {
 export async function getEnvs(): Promise<IEnv> {
   const kernel: Kernel.IKernel = await createNewKernel()
   window.addEventListener('beforeunload', () => kernel.shutdown())
-  const url = await getBackend(kernel, 'OPENBAYES_JOB_URL')
-  const token = await getBackend(kernel, 'OPENBAYES_TOKEN')
+  let url = await getBackend(kernel, 'OPENBAYES_JOB_URL')
+  if (url.length >= 2) {
+    url = (url as string).slice(1, url.length - 1)
+  }
+  url = (url as string).replace('http://', 'https://')
+  url = (url as string).replace('openbayes-server-svc', location.host)
+
+  let token = await getBackend(kernel, 'OPENBAYES_TOKEN')
+  token = (token as string).replace("'", '')
   return Env(url, token)
 }
 
