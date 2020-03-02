@@ -49,7 +49,7 @@ const bindingComponent = (
                     className="linkPath"
                     target="_blank"
                     href={
-                      'https://stg.openbayes.com/console/' +
+                      `https://${location.host}/console/` +
                       `${binding.user_id}/datasets/${binding.dataset_id}/${binding.version}`
                     }
                   >
@@ -80,7 +80,7 @@ const bindingComponent = (
                     className="linkPath"
                     target="_blank"
                     href={
-                      'https://stg.openbayes.com/console/' +
+                      `https://${location.host}/console/` +
                       `${binding.user_id}/jobs/${binding.job_id}/output`
                     }
                   >
