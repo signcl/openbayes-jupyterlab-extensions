@@ -23,6 +23,7 @@ export class BindingsWidget extends Widget {
       return
     }
 
+    console.log(`fetch url: ${props.url}`)
     fetch(props.url, {
       method: 'get',
       headers: {
