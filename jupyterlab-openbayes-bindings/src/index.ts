@@ -3,12 +3,12 @@ import {
   JupyterFrontEndPlugin,
   ILayoutRestorer
 } from '@jupyterlab/application'
-import { ISettingRegistry } from '@jupyterlab/coreutils'
 import { MainAreaWidget, WidgetTracker } from '@jupyterlab/apputils'
 import { ITerminal } from '@jupyterlab/terminal'
 import * as WidgetModuleType from '@jupyterlab/terminal/lib/widget'
 
 import { BindingsWidget, NAMESPACE } from './app'
+import { getEnvs } from './env'
 
 namespace CommandIDs {
   export const createNew = 'bindings-terminal:create-new'
@@ -19,14 +19,10 @@ namespace CommandIDs {
  * Initialization data for the jupyterlab-openbayes-bindings extension.
  */
 const extension: JupyterFrontEndPlugin<void> = {
-  id: 'jupyterlab-openbayes-bindings:bindings',
+  id: 'jupyterlab-openbayes-bindings',
   autoStart: true,
-  requires: [ISettingRegistry, ILayoutRestorer],
-  activate: (
-    app: JupyterFrontEnd,
-    settingRegistry: ISettingRegistry,
-    restorer: ILayoutRestorer
-  ) => {
+  requires: [ILayoutRestorer],
+  activate: (app: JupyterFrontEnd, restorer: ILayoutRestorer) => {
     console.log(
       'JupyterLab extension jupyterlab-openbayes-bindings is activated!'
     )
@@ -59,16 +55,9 @@ const extension: JupyterFrontEndPlugin<void> = {
       app.shell.add(widget, 'left', { rank: 101 })
     }
 
-    Promise.all([settingRegistry.load(extension.id), app.restored])
-      .then(([settings]) => {
-        const url = settings.get('url').composite as string
-        const token = settings.get('token').composite as string
-        createWidget(url, token)
-      })
-      .catch(error => {
-        createWidget('', '')
-        console.log(error)
-      })
+    getEnvs().then(env => {
+      createWidget(env.url, env.token)
+    })
 
     addCommands(app, tracker)
 
