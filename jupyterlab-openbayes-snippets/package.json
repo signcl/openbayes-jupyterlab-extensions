@@ -1,0 +1,50 @@
+{
+  "name": "jupyterlab-openbayes-snippets",
+  "version": "0.1.0",
+  "description": "OpenBayes Snippets",
+  "keywords": [
+    "jupyter",
+    "jupyterlab",
+    "jupyterlab-extension"
+  ],
+  "homepage": "https://github.com/signcl/openbayes-jupyterlab-extensions",
+  "bugs": {
+    "url": "https://github.com/signcl/openbayes-jupyterlab-extensions/issues"
+  },
+  "license": "BSD-3-Clause",
+  "author": "openbayes",
+  "files": [
+    "lib/**/*.{d.ts,eot,gif,html,jpg,js,js.map,json,png,svg,woff2,ttf}",
+    "style/**/*.{css,eot,gif,html,jpg,json,png,svg,woff2,ttf}"
+  ],
+  "main": "lib/index.js",
+  "types": "lib/index.d.ts",
+  "style": "style/index.css",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/signcl/openbayes-jupyterlab-extensions.git"
+  },
+  "scripts": {
+    "build": "tsc",
+    "clean": "rimraf lib tsconfig.tsbuildinfo",
+    "prepare": "jlpm run clean && jlpm run build",
+    "watch": "tsc -w"
+  },
+  "dependencies": {
+    "@jupyterlab/application": "^1.0.0",
+    "@jupyterlab/apputils": "^1.2.1",
+    "@jupyterlab/notebook": "^1.0.0",
+    "@types/react-dom": "^16.9.5",
+    "phosphor-signaling": "^1.2.0"
+  },
+  "devDependencies": {
+    "rimraf": "^2.6.1",
+    "typescript": "~3.5.2"
+  },
+  "sideEffects": [
+    "style/*.css"
+  ],
+  "jupyterlab": {
+    "extension": true
+  }
+}
