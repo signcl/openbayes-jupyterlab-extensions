@@ -1,0 +1,50 @@
+:root {
+  --indent: 1em;
+  --snippets-icon-light: url("openbayes-snippets-light.svg");
+  --snippets-icon-dark: url("openbayes-snippets-dark.svg");
+  --snippets-icon: var(--snippets-icon-dark);
+
+  /* Color - link color */
+  --link-color-h: 211;
+  --link-color-s: 100%;
+  --link-color-l: 50%;
+  --link-color-hsl: var(--link-color-h), var(--link-color-s),
+    var(--link-color-l);
+  --link-color: hsl(var(--link-color-hsl));
+}
+
+[data-jp-theme-light="true"] .snippets-icon {
+  --snippets-icon: var(--snippets-icon-light);
+}
+[data-jp-theme-light="false"] .snippets-icon {
+  --snippets-icon: var(--snippets-icon-dark);
+}
+
+.snippets-setting-icon {
+  background-image: var(--snippets-icon);
+}
+
+.snippets-icon {
+  background-image: var(--snippets-icon);
+  min-width: 16px;
+  min-height: 16px;
+  background-size: 16px;
+  display: inline-block;
+  vertical-align: middle;
+  background-repeat: no-repeat;
+  background-position: center;
+  margin: auto;
+}
+
+.snippets-widget {
+  background: var(--jp-layout-color1);
+  overflow: scroll;
+  color: var(--jp-ui-font-color1);
+  /* This is needed so that all font sizing of children done in ems is
+       * relative to this base size */
+  font-size: var(--jp-ui-font-size1);
+}
+
+.linkPath {
+  color: var(--link-color);
+}
