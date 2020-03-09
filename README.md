@@ -63,6 +63,10 @@
 - [bindings](https://github.com/signcl/openbayes-jupyterlab-extensions/tree/master/jupyterlab-openbayes-bindings)
 
  	 `$ jupyter labextension install jupyterlab-openbayes-bindings`
+ 	 
+- [snippets](https://github.com/signcl/openbayes-jupyterlab-extensions/tree/master/jupyterlab-openbayes-snippets)
+
+ 	 `$ jupyter labextension install jupyterlab-openbayes-snippets`
 
 ## 插件发布
  
