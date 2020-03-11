@@ -7,6 +7,7 @@ import { NotebookActions } from '@jupyterlab/notebook'
 import { INotebookTracker } from '@jupyterlab/notebook'
 
 import { SnippetsWidget } from './snippets'
+import { getSnippets } from './api'
 
 const NAMESPACE = 'openbayes-bindings'
 
@@ -27,15 +28,15 @@ const extension: JupyterFrontEndPlugin<void> = {
     )
 
     const widget = new SnippetsWidget({
-      snippets: getSnippets(),
+      snippets: await getSnippets(),
       insertSnippets: snippets => {
-        snippets.map((snippet, index) => {
+        snippets.map((code, index) => {
           if (tracker.currentWidget) {
             let nbWidget = tracker.currentWidget.content
             if (tracker.activeCell.model.value.text != '') {
               NotebookActions.insertBelow(nbWidget)
             }
-            tracker.activeCell.model.value.text = snippet['code']
+            tracker.activeCell.model.value.text = code.content
             NotebookActions.insertBelow(nbWidget)
             NotebookActions.deleteCells(nbWidget)
             if (nbWidget.model.cells.length != nbWidget.activeCellIndex + 1) {
@@ -57,49 +58,3 @@ const extension: JupyterFrontEndPlugin<void> = {
 }
 
 export default extension
-
-function getSnippets() {
-  return JSON.parse(`{
-  "data": [
-    {
-      "title":"get job url",
-      "description":"",
-      "codes":[
-        {
-          "code":"import os",
-          "description":""
-        },
-        {
-          "code":"import os\\nos.environ['OPENBAYES_JOB_URL']",
-          "description":""
-        }
-      ]
-    },
-    {
-      "title":"get envs",
-      "description":"",
-      "codes":[
-        {
-          "code":"env",
-          "description":""
-        },
-        {
-          "code":"import os\\nos.environ['OPENBAYES_JOB_URL']",
-          "description":""
-        }
-      ]
-    },
-    {
-      "title":"env",
-      "description":"",
-      "codes":[
-        {
-          "code":"env",
-          "description":""
-        }
-      ]
-    }
-  ]
-}
-`).data
-}
