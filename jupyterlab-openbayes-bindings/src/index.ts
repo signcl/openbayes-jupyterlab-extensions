@@ -9,6 +9,7 @@ import * as WidgetModuleType from '@jupyterlab/terminal/lib/widget'
 
 import { BindingsWidget, NAMESPACE } from './app'
 import { getEnvs } from './env'
+import { DatasetBinding, getBindings, JobOutputBinding } from './api'
 
 namespace CommandIDs {
   export const createNew = 'bindings-terminal:create-new'
@@ -22,7 +23,7 @@ const extension: JupyterFrontEndPlugin<void> = {
   id: 'jupyterlab-openbayes-bindings',
   autoStart: true,
   requires: [ILayoutRestorer],
-  activate: (app: JupyterFrontEnd, restorer: ILayoutRestorer) => {
+  activate: async (app: JupyterFrontEnd, restorer: ILayoutRestorer) => {
     console.log(
       'JupyterLab extension jupyterlab-openbayes-bindings is activated!'
     )
@@ -34,10 +35,11 @@ const extension: JupyterFrontEndPlugin<void> = {
       namespace
     })
 
-    const createWidget = (url: string, token: string) => {
+    const createWidget = (
+      bindings: Array<JobOutputBinding | DatasetBinding>
+    ) => {
       const widget = new BindingsWidget({
-        url: url,
-        token: token,
+        bindings: bindings || [],
         openInTerminal: path => {
           return commands.execute(CommandIDs.open, {
             path: path
@@ -55,11 +57,18 @@ const extension: JupyterFrontEndPlugin<void> = {
       app.shell.add(widget, 'left', { rank: 101 })
     }
 
-    getEnvs().then(env => {
-      createWidget(env.url, env.token)
-    })
-
     addCommands(app, tracker)
+
+    getEnvs().then(env => {
+      getBindings(env.url, env.token).then(
+        data => {
+          createWidget(data.datasets)
+        },
+        () => {
+          createWidget([])
+        }
+      )
+    })
 
     return
   }
