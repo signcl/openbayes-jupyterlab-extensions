@@ -20,7 +20,9 @@ export async function getEnvs(): Promise<IEnv> {
   url = (url as string).replace('openbayes-server-svc', location.host)
 
   let token = await getBackend(kernel, 'OPENBAYES_TOKEN')
-  token = (token as string).replace("'", '')
+  if (token.length >= 2) {
+    token = (token as string).slice(1, token.length - 1)
+  }
   return Env(url, token)
 }
 

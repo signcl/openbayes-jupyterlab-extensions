@@ -37,3 +37,21 @@ export interface DatasetBindingLinks {
   self: string
   open: string
 }
+
+export async function getBindings(url: string, token: string) {
+  if (url === '' || token === '') {
+    return []
+  }
+  const response = await fetch(url, {
+    method: 'get',
+    headers: {
+      authorization: 'Bearer ' + token,
+      accept: 'application/json',
+      'content-type': 'application/json'
+    }
+  })
+  if (response.status === 200) {
+    return await response.json()
+  }
+  return []
+}

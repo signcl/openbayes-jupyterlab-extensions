@@ -5,7 +5,7 @@ import {
   DatasetBindingTypeEnum,
   JobOutputBinding,
   JobOutputBindingTypeEnum
-} from './model'
+} from './api'
 import { IProps } from './app'
 
 export function BindingsComponent(props: IProps) {
