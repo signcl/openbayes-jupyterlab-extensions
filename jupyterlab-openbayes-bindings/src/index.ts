@@ -4,8 +4,10 @@ import {
   ILayoutRestorer
 } from '@jupyterlab/application'
 import { MainAreaWidget, WidgetTracker } from '@jupyterlab/apputils'
-import { ITerminal } from '@jupyterlab/terminal'
+
+// Name-only import so as to not trigger inclusion in main bundle
 import * as WidgetModuleType from '@jupyterlab/terminal/lib/widget'
+import { ITerminal } from '@jupyterlab/terminal'
 
 import { BindingsWidget, NAMESPACE } from './app'
 import { getEnvs } from './env'
@@ -30,11 +32,6 @@ const extension: JupyterFrontEndPlugin<void> = {
 
     const { commands } = app
 
-    const namespace = 'bindings-terminal'
-    const tracker = new WidgetTracker<MainAreaWidget<ITerminal.ITerminal>>({
-      namespace
-    })
-
     const createWidget = (
       bindings: Array<JobOutputBinding | DatasetBinding>
     ) => {
@@ -57,7 +54,7 @@ const extension: JupyterFrontEndPlugin<void> = {
       app.shell.add(widget, 'left', { rank: 101 })
     }
 
-    addCommands(app, tracker)
+    addCommands(app)
 
     getEnvs().then(env => {
       getBindings(env.url, env.token).then(
@@ -76,12 +73,14 @@ const extension: JupyterFrontEndPlugin<void> = {
 
 export default extension
 
-function addCommands(
-  app: JupyterFrontEnd,
-  tracker: WidgetTracker<MainAreaWidget<ITerminal.ITerminal>>
-) {
+function addCommands(app: JupyterFrontEnd) {
   const { commands, serviceManager } = app
   const TERMINAL_ICON_CLASS = 'jp-TerminalIcon'
+
+  const namespace = 'bindings-terminal'
+  const tracker = new WidgetTracker<MainAreaWidget<ITerminal.ITerminal>>({
+    namespace
+  })
 
   commands.addCommand(CommandIDs.createNew, {
     label: args => (args['isPalette'] ? 'New Terminal' : 'Terminal'),
@@ -99,9 +98,7 @@ function addCommands(
       const path = args['path'] as string
 
       const session = await (name
-        ? serviceManager.terminals.connectTo(name).catch(reason => {
-            return serviceManager.terminals.startNew()
-          })
+        ? serviceManager.terminals.connectTo({ model: { name } })
         : serviceManager.terminals.startNew())
 
       const term = new Terminal(session, {
@@ -111,9 +108,9 @@ function addCommands(
       term.title.icon = TERMINAL_ICON_CLASS
       term.title.label = '...'
 
-      let main = new MainAreaWidget({ content: term })
+      let main = new MainAreaWidget<ITerminal.ITerminal>({ content: term })
       app.shell.add(main)
-      void (await tracker.add(main))
+      await tracker.add(main)
       app.shell.activateById(main.id)
       return main
     }
