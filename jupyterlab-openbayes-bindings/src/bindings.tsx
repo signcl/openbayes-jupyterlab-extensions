@@ -37,14 +37,14 @@ const bindingComponent = (
   openInTerminal?: (path: string) => void
 ) => {
   return (
-    <div>
+    <div className="bindings-block">
       {bindings.map((binding, i) => {
         if (binding.type === DatasetBindingTypeEnum.DATASET) {
           return (
             <div key={i} className="dataset">
               <div className="nameWrap">
                 <span className="dataset-private"> 数据集 </span>
-                <div className="font-monospace">
+                <div className="dataset-title">
                   <a
                     className="linkPath"
                     target="_blank"
@@ -57,7 +57,7 @@ const bindingComponent = (
                   </a>
                 </div>
               </div>
-              <div className="font-monospace">
+              <div className="dataset-path">
                 <span>终端：</span>
                 <span
                   className="linkPath"
@@ -75,7 +75,7 @@ const bindingComponent = (
             <div key={i} className="dataset">
               <div className="nameWrap">
                 <span className="job-output">输出</span>
-                <div className="font-monospace">
+                <div className="dataset-title">
                   <a
                     className="linkPath"
                     target="_blank"
@@ -88,7 +88,7 @@ const bindingComponent = (
                   </a>
                 </div>
               </div>
-              <div className="font-monospace">
+              <div className="dataset-path">
                 <span>在终端打开：</span>
                 <span
                   className="linkPath"

@@ -1,4 +1,4 @@
-import { Kernel } from '@jupyterlab/services'
+import { Kernel, KernelManager } from '@jupyterlab/services'
 
 interface IEnv {
   url: string
@@ -10,7 +10,7 @@ function Env(url: string, token: string): IEnv {
 }
 
 export async function getEnvs(): Promise<IEnv> {
-  const kernel: Kernel.IKernel = await createNewKernel()
+  const kernel: Kernel.IKernelConnection = await createNewKernel()
   window.addEventListener('beforeunload', () => kernel.shutdown())
   let url = await getBackend(kernel, 'OPENBAYES_JOB_URL')
   if (url.length >= 2) {
@@ -26,51 +26,34 @@ export async function getEnvs(): Promise<IEnv> {
   return Env(url, token)
 }
 
-export async function getBackend(kernel: Kernel.IKernel, name: string) {
+export async function getBackend(
+  kernel: Kernel.IKernelConnection,
+  name: string
+) {
   try {
-    return await sendKernelRequest(
-      kernel,
-      `import os;os.environ['${name}']`,
-      {}
-    )
+    return await sendKernelRequest(kernel, `import os;os.environ['${name}']`)
   } catch (error) {
     throw new Error(error)
   }
 }
 
 export async function createNewKernel() {
-  let options: Kernel.IOptions = await Kernel.getSpecs().then(kernelSpecs => {
-    return { name: kernelSpecs.default }
-  })
-  return await Kernel.startNew(options).then(_kernel => {
-    return _kernel
-  })
+  let kernelManager = new KernelManager()
+  return await kernelManager.startNew({ name: 'python' })
 }
 
 async function sendKernelRequest(
   kernel: Kernel.IKernelConnection,
-  runCode: string,
-  userExpressions: any,
-  runSilent: boolean = false,
-  storeHistory: boolean = false,
-  allowStdIn: boolean = false,
-  stopOnError: boolean = false
+  runCode: string
 ): Promise<any> {
   if (!kernel) {
     throw new Error('Kernel is null or undefined.')
   }
 
-  await kernel.ready
-
   let result = {}
 
   let future = kernel.requestExecute({
-    allow_stdin: allowStdIn,
-    code: runCode,
-    silent: runSilent,
-    stop_on_error: stopOnError,
-    store_history: storeHistory,
-    user_expressions: userExpressions
+    code: runCode
   })
 
   future.onIOPub = msg => {

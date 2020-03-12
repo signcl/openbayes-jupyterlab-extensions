@@ -3,7 +3,7 @@ import * as ReactDOM from 'react-dom'
 
 import { DatasetBinding, JobOutputBinding } from './api'
 import { BindingsComponent } from './bindings'
-import { Widget } from '@phosphor/widgets'
+import { Widget } from '@lumino/widgets'
 
 export const NAMESPACE = 'openbayes-bindings'
 
