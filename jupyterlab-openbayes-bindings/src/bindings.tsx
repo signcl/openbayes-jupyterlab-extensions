@@ -34,7 +34,7 @@ const noBindingComponent = () => {
 
 const bindingComponent = (
   bindings: Array<JobOutputBinding | DatasetBinding>,
-  openInTerminal?: (path: string) => void
+  openInTerminal?: (id: string, path: string) => void
 ) => {
   return (
     <div className="bindings-block">
@@ -62,7 +62,10 @@ const bindingComponent = (
                 <span
                   className="linkPath"
                   onClick={() => {
-                    openInTerminal(`/openbayes/input${binding.path}`)
+                    openInTerminal(
+                      binding.dataset_id,
+                      `/openbayes/input${binding.path}`
+                    )
                   }}
                 >
                   /openbayes/input{binding.path}
@@ -93,7 +96,7 @@ const bindingComponent = (
                 <span
                   className="linkPath"
                   onClick={() => {
-                    openInTerminal(`${binding.path}`)
+                    openInTerminal(binding.job_id, `${binding.path}`)
                   }}
                 >
                   {binding.path}

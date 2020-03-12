@@ -5,11 +5,9 @@ import { DatasetBinding, JobOutputBinding } from './api'
 import { BindingsComponent } from './bindings'
 import { Widget } from '@lumino/widgets'
 
-export const NAMESPACE = 'openbayes-bindings'
-
 export interface IProps {
   bindings?: Array<JobOutputBinding | DatasetBinding>
-  openInTerminal?: (path: string) => void
+  openInTerminal?: (id: string, path: string) => void
 }
 
 export class BindingsWidget extends Widget {

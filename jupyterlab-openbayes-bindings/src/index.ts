@@ -1,17 +1,27 @@
 import {
+  ILayoutRestorer,
   JupyterFrontEnd,
-  JupyterFrontEndPlugin,
-  ILayoutRestorer
+  JupyterFrontEndPlugin
 } from '@jupyterlab/application'
 import { MainAreaWidget, WidgetTracker } from '@jupyterlab/apputils'
-
+import { IRunningSessionManagers, IRunningSessions } from '@jupyterlab/running'
 // Name-only import so as to not trigger inclusion in main bundle
 import * as WidgetModuleType from '@jupyterlab/terminal/lib/widget'
 import { ITerminal } from '@jupyterlab/terminal'
+import { Terminal } from '@jupyterlab/services'
+import { toArray } from '@lumino/algorithm'
+import { terminalIcon } from '@jupyterlab/ui-components'
 
-import { BindingsWidget, NAMESPACE } from './app'
+import { BindingsWidget } from './app'
 import { getEnvs } from './env'
-import { DatasetBinding, getBindings, JobOutputBinding } from './api'
+import {
+  DatasetBinding,
+  DatasetBindingTypeEnum,
+  getBindings,
+  JobOutputBinding
+} from './api'
+
+export const NAMESPACE = 'openbayes-bindings'
 
 namespace CommandIDs {
   export const createNew = 'bindings-terminal:create-new'
@@ -25,7 +35,11 @@ const extension: JupyterFrontEndPlugin<void> = {
   id: 'jupyterlab-openbayes-bindings',
   autoStart: true,
   requires: [ILayoutRestorer],
-  activate: async (app: JupyterFrontEnd, restorer: ILayoutRestorer) => {
+  activate: async (
+    app: JupyterFrontEnd,
+    restorer: ILayoutRestorer,
+    runningSessionManagers: IRunningSessionManagers
+  ) => {
     console.log(
       'JupyterLab extension jupyterlab-openbayes-bindings is activated!'
     )
@@ -35,10 +49,21 @@ const extension: JupyterFrontEndPlugin<void> = {
     const createWidget = (
       bindings: Array<JobOutputBinding | DatasetBinding>
     ) => {
+      bindings.map((binding, i) => {
+        if (runningSessionManagers) {
+          let name =
+            binding.type === DatasetBindingTypeEnum.DATASET
+              ? binding.dataset_id
+              : binding.job_id
+          addRunningSessionManager(runningSessionManagers, app, name)
+        }
+      })
+
       const widget = new BindingsWidget({
         bindings: bindings || [],
-        openInTerminal: path => {
+        openInTerminal: (id, path) => {
           return commands.execute(CommandIDs.open, {
+            name: id,
             path: path
           })
         }
@@ -72,6 +97,43 @@ const extension: JupyterFrontEndPlugin<void> = {
 }
 
 export default extension
+
+function addRunningSessionManager(
+  managers: IRunningSessionManagers,
+  app: JupyterFrontEnd,
+  name: string
+) {
+  let manager = app.serviceManager.terminals
+
+  managers.add({
+    name: name,
+    running: () =>
+      toArray(manager.running()).map(model => new RunningTerminal(model)),
+    shutdownAll: () => manager.shutdownAll(),
+    refreshRunning: () => manager.refreshRunning(),
+    runningChanged: manager.runningChanged
+  })
+
+  class RunningTerminal implements IRunningSessions.IRunningItem {
+    constructor(model: Terminal.IModel) {
+      this._model = model
+    }
+    open() {
+      void app.commands.execute('terminal:open', { name: this._model.name })
+    }
+    icon() {
+      return terminalIcon
+    }
+    label() {
+      return `terminals/${this._model.name}`
+    }
+    shutdown() {
+      return manager.shutdown(this._model.name)
+    }
+
+    private _model: Terminal.IModel
+  }
+}
 
 function addCommands(app: JupyterFrontEnd) {
   const { commands, serviceManager } = app
