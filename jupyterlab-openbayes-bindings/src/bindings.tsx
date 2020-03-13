@@ -6,19 +6,43 @@ import {
   JobOutputBinding,
   JobOutputBindingTypeEnum
 } from './api'
-import { IProps } from './app'
 
-export function BindingsComponent(props: IProps) {
-  if (props.bindings && props.bindings.length > 0) {
-    return bindingComponent(props.bindings, props.openInTerminal)
+export const BindingsComponent = ({
+  bindings,
+  openInTerminal
+}: {
+  loading?: boolean
+  bindings?: Array<JobOutputBinding | DatasetBinding>
+  openInTerminal?: (id: string, path: string) => void
+}) => {
+  if (bindings && bindings.length > 0) {
+    return bindingComponent(bindings, openInTerminal)
   }
   return noBindingComponent()
+}
+
+export const LoadingComponent = () => {
+  return (
+    <div className="bindings-block">
+      <h2 className="title">正在加载数据...</h2>
+      <div>
+        <span>请参考我们的帮助文档&nbsp;&nbsp;</span>
+        <a
+          className="linkPath"
+          target="_blank"
+          href="https://openbayes.com/docs/bayesgear/"
+        >
+          数据集绑定
+        </a>
+      </div>
+    </div>
+  )
 }
 
 const noBindingComponent = () => {
   return (
     <div className="bindings-block">
-      <h2 className="title">暂无绑定数据集</h2>
+      <h2 className="title">暂无绑定数据</h2>
       <div>
         <span>请参考我们的帮助文档&nbsp;&nbsp;</span>
         <a

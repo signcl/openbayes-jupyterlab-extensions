@@ -13,13 +13,6 @@ import { toArray } from '@lumino/algorithm'
 import { terminalIcon } from '@jupyterlab/ui-components'
 
 import { BindingsWidget } from './app'
-import { getEnvs } from './env'
-import {
-  DatasetBinding,
-  DatasetBindingTypeEnum,
-  getBindings,
-  JobOutputBinding
-} from './api'
 
 export const NAMESPACE = 'openbayes-bindings'
 
@@ -35,7 +28,7 @@ const extension: JupyterFrontEndPlugin<void> = {
   id: 'jupyterlab-openbayes-bindings',
   autoStart: true,
   requires: [ILayoutRestorer],
-  activate: async (
+  activate: (
     app: JupyterFrontEnd,
     restorer: ILayoutRestorer,
     runningSessionManagers: IRunningSessionManagers
@@ -46,51 +39,30 @@ const extension: JupyterFrontEndPlugin<void> = {
 
     const { commands } = app
 
-    const createWidget = (
-      bindings: Array<JobOutputBinding | DatasetBinding>
-    ) => {
-      bindings.map((binding, i) => {
+    const widget = new BindingsWidget({
+      openInTerminal: (id, path) => {
+        return commands.execute(CommandIDs.open, {
+          name: id,
+          path: path
+        })
+      },
+      addRunningSession: (name: string) => {
         if (runningSessionManagers) {
-          let name =
-            binding.type === DatasetBindingTypeEnum.DATASET
-              ? binding.dataset_id
-              : binding.job_id
           addRunningSessionManager(runningSessionManagers, app, name)
         }
-      })
+      }
+    })
 
-      const widget = new BindingsWidget({
-        bindings: bindings || [],
-        openInTerminal: (id, path) => {
-          return commands.execute(CommandIDs.open, {
-            name: id,
-            path: path
-          })
-        }
-      })
+    widget.id = 'openbayes-bindings-widget'
+    widget.title.iconClass = 'bindings-icon'
+    widget.title.caption = 'OpenBayes Bindings'
+    widget.title.closable = true
+    widget.addClass('bindings-widget')
 
-      widget.id = 'openbayes-bindings-widget'
-      widget.title.iconClass = 'bindings-icon'
-      widget.title.caption = 'OpenBayes Bindings'
-      widget.title.closable = true
-      widget.addClass('bindings-widget')
-
-      restorer.add(widget, NAMESPACE)
-      app.shell.add(widget, 'left', { rank: 101 })
-    }
+    restorer.add(widget, NAMESPACE)
+    app.shell.add(widget, 'left', { rank: 101 })
 
     addCommands(app)
-
-    getEnvs().then(env => {
-      getBindings(env.url, env.token).then(
-        data => {
-          createWidget(data.datasets)
-        },
-        () => {
-          createWidget([])
-        }
-      )
-    })
 
     return
   }
