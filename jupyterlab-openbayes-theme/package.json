@@ -31,12 +31,12 @@
     "watch": "tsc -w"
   },
   "dependencies": {
-    "@jupyterlab/application": "^1.2.1",
-    "@jupyterlab/apputils": "^1.2.1"
+    "@jupyterlab/application": "^2.0.0",
+    "@jupyterlab/apputils": "^2.0.0"
   },
   "devDependencies": {
-    "rimraf": "^2.6.1",
-    "typescript": "~3.5.2"
+    "rimraf": "~3.0.0",
+    "typescript": "~3.7.3"
   },
   "sideEffects": [
     "style/*.css"
