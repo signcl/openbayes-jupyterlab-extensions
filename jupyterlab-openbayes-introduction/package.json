@@ -31,13 +31,15 @@
     "watch": "tsc -w"
   },
   "dependencies": {
-    "@jupyterlab/application": "^1.2.1",
-    "@jupyterlab/filebrowser": "^1.2.1",
-    "@jupyterlab/mainmenu": "^1.2.1"
+    "@jupyterlab/application": "^2.0.2",
+    "@jupyterlab/filebrowser": "^2.0.2",
+    "@jupyterlab/mainmenu": "^2.0.2",
+    "@jupyterlab/statedb": "^2.0.1",
+    "@lumino/widgets": "^1.11.1"
   },
   "devDependencies": {
-    "rimraf": "^2.6.1",
-    "typescript": "~3.5.2"
+    "rimraf": "~3.0.0",
+    "typescript": "~3.7.3"
   },
   "sideEffects": [
     "style/*.css"
