@@ -7,7 +7,6 @@ import { NotebookActions } from '@jupyterlab/notebook'
 import { INotebookTracker } from '@jupyterlab/notebook'
 
 import { SnippetsWidget } from './snippets'
-import { getSnippets } from './api'
 
 const NAMESPACE = 'openbayes-bindings'
 
@@ -18,7 +17,7 @@ const extension: JupyterFrontEndPlugin<void> = {
   id: 'jupyterlab-openbayes-snippets',
   autoStart: true,
   requires: [ILayoutRestorer, INotebookTracker],
-  activate: async (
+  activate: (
     app: JupyterFrontEnd,
     restorer: ILayoutRestorer,
     tracker: INotebookTracker
@@ -28,9 +27,8 @@ const extension: JupyterFrontEndPlugin<void> = {
     )
 
     const widget = new SnippetsWidget({
-      snippets: await getSnippets(),
       insertSnippets: snippets => {
-        snippets.map((code, index) => {
+        snippets.map((code) => {
           if (tracker.currentWidget) {
             let nbWidget = tracker.currentWidget.content
             if (tracker.activeCell.model.value.text != '') {

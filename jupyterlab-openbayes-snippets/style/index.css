@@ -3,14 +3,6 @@
   --snippets-icon-light: url("openbayes-snippets-light.svg");
   --snippets-icon-dark: url("openbayes-snippets-dark.svg");
   --snippets-icon: var(--snippets-icon-dark);
-
-  /* Color - link color */
-  --link-color-h: 211;
-  --link-color-s: 100%;
-  --link-color-l: 50%;
-  --link-color-hsl: var(--link-color-h), var(--link-color-s),
-    var(--link-color-l);
-  --link-color: hsl(var(--link-color-hsl));
 }
 
 [data-jp-theme-light="true"] .snippets-icon {
@@ -43,8 +35,285 @@
   /* This is needed so that all font sizing of children done in ems is
        * relative to this base size */
   font-size: var(--jp-ui-font-size1);
+  padding: 10px;
 }
 
-.linkPath {
-  color: var(--link-color);
+.snippets-widget .filter-input {
+  line-height: 1.5rem;
+  font-size: 1.1rem;
+  display: block;
+  padding: 0 5px;
+  width: calc(100% - 10px)
+}
+
+ul.snippet-list {
+  list-style: none;
+  padding: 0;
+  border-bottom: 1px solid gray;
+  margin-bottom: 1em;
+  padding-bottom: 1em;
+  max-height: 7.5rem;
+  overflow: auto;
+}
+
+ul.snippet-list li a {
+  line-height: 1.5rem;
+}
+
+ul.snippet-list li a {
+  display: block;
+  color: var(--text-color-hsl);
+  font-size: 1.1rem;
+  padding: 5px;
+}
+
+ul.snippet-list li a.active {
+  background-color: silver;
+}
+
+.snippets-widget button {
+  cursor: pointer;
+  font-size: 1.2em;
+  float: right;
+}
+
+:root {
+  /* Color - text color */
+  --text-color-h: 238;
+  --text-color-s: 71%;
+  --text-color-l: 11%;
+  --text-color-hsl: var(--text-color-h), var(--text-color-s), var(--text-color-l);
+
+  --text-color: hsl(var(--text-color-hsl));
+  --text-color-0: hsla(var(--text-color-hsl), 0);
+  --text-color-3: hsla(var(--text-color-hsl), .03);
+  --text-color-5: hsla(var(--text-color-hsl), .05);
+  --text-color-7: hsla(var(--text-color-hsl), .07);
+  --text-color-10: hsla(var(--text-color-hsl), .1);
+  --text-color-20: hsla(var(--text-color-hsl), .2);
+  --text-color-30: hsla(var(--text-color-hsl), .3);
+  --text-color-40: hsla(var(--text-color-hsl), .4);
+  --text-color-50: hsla(var(--text-color-hsl), .5);
+  --text-color-60: hsla(var(--text-color-hsl), .6);
+  --text-color-70: hsla(var(--text-color-hsl), .7);
+  --text-color-80: hsla(var(--text-color-hsl), .8);
+  --text-color-90: hsla(var(--text-color-hsl), .9);
+  --text-color-light: hsl(var(--text-color-h), var(--text-color-s), calc(var(--text-color-l) / .9));
+  --text-color-dark: hsl(var(--text-color-h), var(--text-color-s), calc(var(--text-color-l) * .9));
+
+  /* Color - link color */
+  --link-color-h: 211;
+  --link-color-s: 100%;
+  --link-color-l: 50%;
+  --link-color-hsl: var(--link-color-h), var(--link-color-s), var(--link-color-l);
+
+  --link-color: hsl(var(--link-color-hsl));
+  --link-color-0: hsla(var(--link-color-hsl), 0);
+  --link-color-3: hsla(var(--link-color-hsl), .03);
+  --link-color-5: hsla(var(--link-color-hsl), .05);
+  --link-color-7: hsla(var(--link-color-hsl), .07);
+  --link-color-10: hsla(var(--link-color-hsl), .1);
+  --link-color-20: hsla(var(--link-color-hsl), .2);
+  --link-color-30: hsla(var(--link-color-hsl), .3);
+  --link-color-40: hsla(var(--link-color-hsl), .4);
+  --link-color-50: hsla(var(--link-color-hsl), .5);
+  --link-color-60: hsla(var(--link-color-hsl), .6);
+  --link-color-70: hsla(var(--link-color-hsl), .7);
+  --link-color-80: hsla(var(--link-color-hsl), .8);
+  --link-color-90: hsla(var(--link-color-hsl), .9);
+  --link-color-light: hsl(var(--link-color-h), var(--link-color-s), calc(var(--link-color-l) / .9));
+  --link-color-dark: hsl(var(--link-color-h), var(--link-color-s), calc(var(--link-color-l) * .9));
+
+  /* Color - background color */
+  --bg-color-h: 0;
+  --bg-color-s: 0%;
+  --bg-color-l: 100%;
+  --bg-color-hsl: var(--bg-color-h), var(--bg-color-s), var(--bg-color-l);
+
+  --bg-color: hsl(var(--bg-color-hsl));
+  --bg-color-0: hsla(var(--bg-color-hsl), 0);
+  --bg-color-3: hsla(var(--bg-color-hsl), .03);
+  --bg-color-5: hsla(var(--bg-color-hsl), .05);
+  --bg-color-7: hsla(var(--bg-color-hsl), .07);
+  --bg-color-10: hsla(var(--bg-color-hsl), .1);
+  --bg-color-20: hsla(var(--bg-color-hsl), .2);
+  --bg-color-30: hsla(var(--bg-color-hsl), .3);
+  --bg-color-40: hsla(var(--bg-color-hsl), .4);
+  --bg-color-50: hsla(var(--bg-color-hsl), .5);
+  --bg-color-60: hsla(var(--bg-color-hsl), .6);
+  --bg-color-70: hsla(var(--bg-color-hsl), .7);
+  --bg-color-80: hsla(var(--bg-color-hsl), .8);
+  --bg-color-90: hsla(var(--bg-color-hsl), .9);
+  --bg-color-light: hsl(var(--bg-color-h), var(--bg-color-s), calc(var(--bg-color-l) / .9));
+  --bg-color-dark: hsl(var(--bg-color-h), var(--bg-color-s), calc(var(--bg-color-l) * .9));
+
+  /* Color - code color, an inverted demo from link-color */
+  --code-color-h: calc(var(--link-color-h) + 170);
+  --code-color-s: calc(var(--link-color-s) * .6);
+  --code-color-l: var(--link-color-l);
+  --code-color-hsl: var(--code-color-h), var(--code-color-s), var(--code-color-l);
+
+  --code-color: hsl(var(--code-color-hsl));
+  --code-color-0: hsla(var(--code-color-hsl), 0);
+  --code-color-3: hsla(var(--code-color-hsl), .03);
+  --code-color-5: hsla(var(--code-color-hsl), .05);
+  --code-color-7: hsla(var(--code-color-hsl), .07);
+  --code-color-10: hsla(var(--code-color-hsl), .1);
+  --code-color-20: hsla(var(--code-color-hsl), .2);
+  --code-color-30: hsla(var(--code-color-hsl), .3);
+  --code-color-40: hsla(var(--code-color-hsl), .4);
+  --code-color-50: hsla(var(--code-color-hsl), .5);
+  --code-color-60: hsla(var(--code-color-hsl), .6);
+  --code-color-70: hsla(var(--code-color-hsl), .7);
+  --code-color-80: hsla(var(--code-color-hsl), .8);
+  --code-color-90: hsla(var(--code-color-hsl), .9);
+  --code-color-light: hsl(var(--code-color-h), var(--code-color-s), calc(var(--code-color-l) / .9));
+  --code-color-dark: hsl(var(--code-color-h), var(--code-color-s), calc(var(--code-color-l) * .9));
+
+  --blue: var(--link-color);
+  --indigo: #6610f2;
+  --purple: #9b51e0;
+  --pink: #e051c8;
+  --red: #eb5757;
+  --orange: #fd7e14;
+  --yellow: #ffc107;
+  --green: #27ae60;
+  --teal: #20c997;
+  --cyan: #56ccf2;
+  --white: #fff;
+  --gray: #6c757d;
+  --gray-dark: #343a40;
+  --primary: var(--link-color);
+  --secondary: var(--gray);
+  --success: var(--green);
+  --info: var(--cyan);
+  --warning: var(--yellow);
+  --danger: var(--red);
+  --light: #f8f9fa;
+  --dark: var(--gray-dark);
+
+  @media (prefers-color-scheme: dark) {
+    --text-color-h: 213;
+    --text-color-s: 32%;
+    --text-color-l: 70%;
+
+    --link-color-h: 202;
+    --link-color-s: 100%;
+    --link-color-l: 60%;
+
+    --bg-color-h: 220;
+    --bg-color-s: 10%;
+    --bg-color-l: 16%;
+
+    --code-color-s: calc(var(--link-color-s) * .95);
+    --code-color-l: calc(var(--link-color-l) * 1.4);
+
+    --body-color-opaque: hsl(220, 10%, 12%);
+  }
+}
+
+
+/* openbayes theme empowered by randomized */
+/* @author: sparanoid */
+:root {
+  --rdmz-h: var(--code-color-h, 381);
+  --rdmz-s: var(--code-color-s, 60%);
+  --rdmz-l: var(--code-color-l, 50%);
+  --rdmz-a: 1;
+}
+
+.hljs,
+.hljs span {
+  --rdmz-hsl: var(--rdmz-h), var(--rdmz-s), var(--rdmz-l);
+  color: hsla(var(--rdmz-hsl), var(--rdmz-a));
+}
+
+.hljs {
+  display: block;
+  overflow-x: auto;
+  background-color: hsla(var(--rdmz-hsl), .1);
+  padding: .5em;
+}
+
+/* General, default plain text */
+.hljs-ln-code,
+.hljs.plaintext {
+  color: var(--text-color);
+}
+
+.hljs.plaintext {
+  padding: .2em;
+}
+
+/* Comment */
+.hljs-comment,
+.hljs-quote {
+  --rdmz-a: .5;
+  --rdmz-s: calc(var(--code-color-s) * .6);
+}
+
+/* Red */
+.hljs-variable,
+.hljs-template-variable,
+.hljs-tag,
+.hljs-name,
+.hljs-selector-id,
+.hljs-selector-class,
+.hljs-regexp,
+.hljs-deletion {
+  --rdmz-h: calc(var(--code-color-h) - 90);
+}
+
+/* Orange */
+.hljs-number,
+.hljs-built_in,
+.hljs-builtin-name,
+.hljs-literal,
+.hljs-type,
+.hljs-params,
+.hljs-meta,
+.hljs-link {
+  --rdmz-h: calc(var(--code-color-h) + 30);
+}
+
+/* Yellow */
+.hljs-attr,
+.hljs-attribute {
+  --rdmz-h: calc(var(--code-color-h) - 30);
+}
+
+/* Green */
+.hljs-string,
+.hljs-symbol,
+.hljs-bullet,
+.hljs-addition {
+  --rdmz-h: calc(var(--code-color-h) + -60);
+}
+
+/* Blue */
+.hljs-title,
+.hljs-section {
+  --rdmz-h: calc(var(--code-color-h) + 180);
+}
+
+@media (prefers-color-scheme: dark) {
+
+  .hljs-title,
+  .hljs-section {
+    text-shadow: 0 0 10px hsla(var(--rdmz-hsl), .5);
+  }
+}
+
+/* Purple */
+.hljs-keyword,
+.hljs-selector-tag {
+  --rdmz-h: calc(var(--code-color-h) + 210);
+}
+
+.hljs-emphasis {
+  font-style: italic;
+}
+
+.hljs-strong {
+  font-weight: bold;
 }
