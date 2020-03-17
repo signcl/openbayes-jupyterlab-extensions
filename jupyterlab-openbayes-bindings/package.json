@@ -1,6 +1,6 @@
 {
   "name": "jupyterlab-openbayes-bindings",
-  "version": "0.1.11",
+  "version": "0.2.0",
   "description": "Openbayes Bindings",
   "keywords": [
     "jupyter",
