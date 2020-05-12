@@ -1,0 +1,102 @@
+@import "./openbayes.css";
+
+:root {
+  --indent: 1em;
+  --task-icon-light: url("openbayes-task-light.svg");
+  --task-icon-dark: url("openbayes-task-dark.svg");
+  --task-icon: var(--task-icon-dark);
+
+  --fontstack-monospace: Menlo, Consolas, monospace;
+}
+
+[data-jp-theme-light="true"] .task-icon {
+  --task-icon: var(--task-icon-light);
+}
+[data-jp-theme-light="false"] .task-icon {
+  --task-icon: var(--task-icon-dark);
+}
+
+.task-icon {
+  background-image: var(--task-icon);
+  min-width: 16px;
+  min-height: 16px;
+  background-size: 16px;
+  display: inline-block;
+  vertical-align: middle;
+  background-repeat: no-repeat;
+  background-position: center;
+  margin: auto;
+}
+
+.task-widget {
+  background: var(--jp-layout-color1);
+  overflow: scroll;
+  color: var(--jp-ui-font-color1);
+  /* This is needed so that all font sizing of children done in ems is
+     * relative to this base size */
+  font-size: var(--jp-ui-font-size1);
+}
+
+.task-block {
+  padding: 15px;
+}
+
+.title {
+  padding: 15px;
+  font-weight: bold;
+  flex: 1;
+  display: flex;
+  align-items: center;
+  color: var(--text-color);
+}
+
+.toolbar {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: none;
+  height: auto;
+  box-shadow: none;
+}
+
+.input-container {
+  padding: 10px 12px;
+  z-index: 2;
+}
+
+.switch-label {
+  display: table-cell;
+  vertical-align: middle;
+  padding-right: 10px;
+  font-size: var(--jp-ui-font-size2);
+}
+
+.material-switch {
+  color: white;
+}
+
+.material-switch input {
+  height: 100%;
+}
+
+.hidden {
+  display: none !important;
+}
+
+.deploy-button {
+  padding: 15px;
+}
+
+.deploy-button button {
+  height: 30px;
+  width: 95%;
+  border-radius: 2px;
+  font-size: 12px;
+  border-width: 0;
+  padding: 2px 4px;
+  font-weight: 600;
+  text-transform: uppercase;
+  color: var(--text-color);
+  background: var(--text-color-10);
+}
