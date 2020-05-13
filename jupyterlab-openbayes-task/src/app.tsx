@@ -3,14 +3,18 @@ import * as ReactDOM from 'react-dom'
 import { Widget } from '@lumino/widgets'
 import { Switch } from '@material-ui/core'
 
+export interface IProps {
+  runCodes?: () => void
+}
+
 export class LeftPanelWidget extends Widget {
-  constructor() {
+  constructor(props: IProps = {}) {
     super()
-    ReactDOM.render(<LeftPanelComponent />, this.node)
+    ReactDOM.render(<LeftPanelComponent runCodes={props.runCodes} />, this.node)
   }
 }
 
-const LeftPanelComponent = ({}: {}) => {
+const LeftPanelComponent = ({ runCodes }: { runCodes?: () => void }) => {
   const [checked, setChecked] = useState(false)
 
   return (
@@ -28,7 +32,7 @@ const LeftPanelComponent = ({}: {}) => {
         />
       </div>
       <div className={'deploy-button ' + (checked ? '' : 'hidden')}>
-        <button color="primary" style={{ width: '100%' }}>
+        <button color="primary" style={{ width: '100%' }} onClick={runCodes}>
           创建新容器运行
         </button>
       </div>
