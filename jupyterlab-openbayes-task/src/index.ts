@@ -12,6 +12,7 @@ import { isCodeCellModel } from '@jupyterlab/cells'
 // import * as fs from 'fs-extra'
 
 import { LeftPanelWidget } from './app'
+import { run, uploadCode, uploadRequest } from './api'
 
 export const NAMESPACE = 'openbayes-task'
 
@@ -57,9 +58,11 @@ const extension: JupyterFrontEndPlugin<void> = {
         //   ext: 'py'
         // })
         //
-        // console.log(pythonPath)
-        //
-        // await fs.writeFile(pythonPath.path, codes)
+        // console.log(pythonPath.path)
+
+        // await fs.writeFile('./untitled.py', codes)
+
+        await runCode(codes)
       }
     })
 
@@ -77,3 +80,18 @@ const extension: JupyterFrontEndPlugin<void> = {
 }
 
 export default extension
+
+async function runCode(path: string) {
+  const token =
+    'eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJhaXNlbnNpeSIsInBhdGgiOiIvIiwiZXhwIjoxNTkyMjA0NzA0fQ.kLZCixdA9p8TSjDdNENA4a-1INmlD3bZxsKZMRE1rMVXCx68kiiu7HHB2ouJTzmGRqG99cPwLfwIZl6E3uHPOA'
+
+  const request = await uploadRequest('aisensiy', token)
+
+  const cid = await uploadCode(
+    request.upload_url,
+    request.token,
+    path,
+    'main.py'
+  )
+  return await run('aisensiy', token, cid, 'python main.py', {})
+}
