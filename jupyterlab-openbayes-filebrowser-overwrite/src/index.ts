@@ -30,8 +30,6 @@ const extension: JupyterFrontEndPlugin<void> = {
 
     addCommands(app, factory);
 
-    // app.contextMenu.menu.removeItemAt(11)
-
     const selectorItem = '.jp-DirListing-item[data-isdir]';
 
     app.contextMenu.addItem({
@@ -72,7 +70,7 @@ function addCommands(
         !!tracker.currentWidget &&
         tracker.currentWidget.selectedItems().next !== undefined,
     icon: fileIcon.bindprops({stylesheet: 'menuItem'}),
-    label: 'Copy Full Path'
+    label: 'Copy OpenBayes Path'
   });
 }
 
