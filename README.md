@@ -43,6 +43,10 @@
 #### [ ] altair 强大的交互式展示支持
 - 参考 [链接](https://towardsdatascience.com/jupyter-superpower-interactive-visualization-combo-with-python-ffc0adb37b7b)
 
+#### [x] 拷贝 OpenBayes 容器文件的完整路径
+- 添加 menu item 「Copy OpenBayes Path」，拷贝容器内文件 `/openbayes/home/xxx` 的完整路径到系统剪贴板
+- 不移除 「Copy Path」，留给 juypterlab 的其他组件使用
+
 ## 插件安装
 
 - <s>[dataset-browser](https://github.com/signcl/openbayes-jupyterlab-extensions/tree/master/jupyterlab-openbayes-dataset-browser)
@@ -64,6 +68,10 @@
 - [snippets](https://github.com/signcl/openbayes-jupyterlab-extensions/tree/master/jupyterlab-openbayes-snippets)
 
  	 `$ jupyter labextension install jupyterlab-openbayes-snippets`
+ 	 
+- [filebrowser-overwrite](https://github.com/signcl/openbayes-jupyterlab-extensions/tree/master/jupyterlab-openbayes-filebrowser-overwrite)
+
+ 	 `$ jupyter labextension install jupyterlab-openbayes-filebrowser-overwrite`
 
 ## 插件发布
  
