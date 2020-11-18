@@ -4,15 +4,17 @@ import {
   JupyterFrontEndPlugin
 } from '@jupyterlab/application'
 
+import { showErrorMessage } from '@jupyterlab/apputils'
+
 import { INotebookTracker } from '@jupyterlab/notebook'
 
 import { isCodeCellModel } from '@jupyterlab/cells'
 
-// import { ContentsManager } from '@jupyterlab/services'
-// import * as fs from 'fs-extra'
+import { DocumentManager, renameDialog } from '@jupyterlab/docmanager'
 
 import { LeftPanelWidget } from './app'
-import { run, uploadCode, uploadRequest } from './api'
+import { runTask} from "./cmd";
+
 
 export const NAMESPACE = 'openbayes-task'
 
@@ -22,7 +24,10 @@ export const NAMESPACE = 'openbayes-task'
 const extension: JupyterFrontEndPlugin<void> = {
   id: 'jupyterlab-openbayes-task',
   autoStart: true,
-  requires: [ILayoutRestorer, INotebookTracker],
+  requires: [
+      ILayoutRestorer,
+    INotebookTracker,
+  ],
   activate: (
     app: JupyterFrontEnd,
     restorer: ILayoutRestorer,
@@ -49,20 +54,51 @@ const extension: JupyterFrontEndPlugin<void> = {
           }
         }
 
-        console.log(codes)
+        // console.log(codes)
 
-        // let contents = new ContentsManager()
-        // let pythonPath = await contents.newUntitled({
-        //   path: '/',
-        //   type: 'file',
-        //   ext: 'py'
-        // })
-        //
-        // console.log(pythonPath.path)
+        const { commands } = app;
 
-        // await fs.writeFile('./untitled.py', codes)
+        let model = await commands.execute('docmanager:new-untitled', {
+          path: "/",
+          type: 'file',
+          ext: 'py'
+        })
 
-        await runCode(codes)
+        model.content = codes;
+        model.format = 'text'
+        await app.serviceManager.contents.save(model.path, model);
+
+        const opener: DocumentManager.IWidgetOpener = {
+          open: widget => {
+            if (!widget.id) {
+              widget.id = `document-manager-${++Private.id}`;
+            }
+            widget.title.dataset = {
+              'type': 'document-title',
+              ...widget.title.dataset
+            };
+            if (!widget.isAttached) {
+              app.shell.add(widget, "main");
+            }
+            app.shell.activateById(widget.id);
+          }
+        };
+        const registry = app.docRegistry;
+        const docManager = new DocumentManager({ registry: registry, manager: app.serviceManager, opener: opener });
+
+        model = await renameDialog(docManager, model.path).catch(error => {
+          if (error !== 'File not renamed') {
+            void showErrorMessage('Rename Error', error);
+          }
+        })
+
+        if (model !== undefined) {
+          console.log("name: " + model.name + " path: " + model.path)
+          // Error: Canceled future for execute_request message before replies were done
+          await runTask(model.path)
+        }
+
+
       }
     })
 
@@ -81,17 +117,10 @@ const extension: JupyterFrontEndPlugin<void> = {
 
 export default extension
 
-async function runCode(path: string) {
-  const token =
-    'eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJhaXNlbnNpeSIsInBhdGgiOiIvIiwiZXhwIjoxNTkyMjA0NzA0fQ.kLZCixdA9p8TSjDdNENA4a-1INmlD3bZxsKZMRE1rMVXCx68kiiu7HHB2ouJTzmGRqG99cPwLfwIZl6E3uHPOA'
-
-  const request = await uploadRequest('aisensiy', token)
-
-  const cid = await uploadCode(
-    request.upload_url,
-    request.token,
-    path,
-    'main.py'
-  )
-  return await run('aisensiy', token, cid, 'python main.py', {})
+namespace Private {
+  /**
+   * A counter for unique IDs.
+   */
+  export
+  let id = 0;
 }
