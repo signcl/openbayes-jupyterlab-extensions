@@ -13,8 +13,9 @@ import { isCodeCellModel } from '@jupyterlab/cells'
 import { DocumentManager, renameDialog } from '@jupyterlab/docmanager'
 
 import { LeftPanelWidget } from './app'
-import { runTask} from "./cmd";
 
+import { run, uploadCode, uploadRequest } from './api'
+import { getEnvs } from "./env";
 
 export const NAMESPACE = 'openbayes-task'
 
@@ -93,11 +94,10 @@ const extension: JupyterFrontEndPlugin<void> = {
         })
 
         if (model !== undefined) {
-          console.log("name: " + model.name + " path: " + model.path)
-          // Error: Canceled future for execute_request message before replies were done
-          await runTask(model.path)
+          console.log("path: " + model.path + ", name: " + model.name)
+          // await runCode(model.path)
+          await runCode(codes)
         }
-
 
       }
     })
@@ -113,6 +113,21 @@ const extension: JupyterFrontEndPlugin<void> = {
 
     return
   }
+}
+
+async function runCode(path: string) {
+
+  const env = await getEnvs()
+
+  const request = await uploadRequest(env.user, env.token)
+
+  const cid = await uploadCode(
+      request.upload_url,
+      request.token,
+      path,
+      'main.py'
+  )
+  return await run(env.user, env.token, env.url, cid, 'python main.py', {})
 }
 
 export default extension
