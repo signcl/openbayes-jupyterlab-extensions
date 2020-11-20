@@ -118,6 +118,12 @@ const extension: JupyterFrontEndPlugin<void> = {
 async function runCode(path: string) {
 
   const env = await getEnvs()
+  // const env = {
+  //   url:'https://dev.openbayes.com/api/users/aisensiy/jobs/99rmorkb9fsm',
+  //   jobID:'99rmorkb9fsm',
+  //   user:'aisensiy',
+  //   token:'eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJhaXNlbnNpeSIsInBhdGgiOiIvIiwiZXhwIjoxNjA2ODE0MjM0fQ.1elRvyFH8O23raZxW_LbWcZtJHzHvOXUlQ9-O1ct0r_bkzVyCXkZpQwn_alkCpvOQ2z-jMlmnaX_KrVyNttkdg'
+  // }
 
   const url = env.url.replace("/"+env.jobID, "")
 
@@ -132,7 +138,7 @@ async function runCode(path: string) {
 
   const job = await getJobDetail(env.url, env.token)
 
-  return await run(env.user, env.token, env.url, cid, 'python main.py', job)
+  return await run(env.user, env.token, url, cid, 'python main.py', job)
 }
 
 export default extension
