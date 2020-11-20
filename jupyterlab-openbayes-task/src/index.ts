@@ -14,7 +14,7 @@ import { DocumentManager, renameDialog } from '@jupyterlab/docmanager'
 
 import { LeftPanelWidget } from './app'
 
-import { run, uploadCode, uploadRequest } from './api'
+import {run, uploadRequest, uploadCode, getJobDetail} from './api'
 import { getEnvs } from "./env";
 
 export const NAMESPACE = 'openbayes-task'
@@ -129,7 +129,10 @@ async function runCode(path: string) {
       path,
       'main.py'
   )
-  return await run(env.user, env.token, env.url, cid, 'python main.py', {})
+
+  const job = await getJobDetail(env.url, env.token)
+
+  return await run(env.user, env.token, env.url, cid, 'python main.py', job)
 }
 
 export default extension
