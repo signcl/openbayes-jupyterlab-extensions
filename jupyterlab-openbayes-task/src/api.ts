@@ -1,5 +1,5 @@
-export async function uploadRequest(user: string, token: string) {
-    const url = 'http://openbayes-server-svc/api/users/' + user + '/jobs/upload-request'
+export async function uploadRequest(user: string, token: string, jobURL: string) {
+    const url = jobURL + '/upload-request'
     const response = await fetch(url, {
         method: 'post',
         headers: {

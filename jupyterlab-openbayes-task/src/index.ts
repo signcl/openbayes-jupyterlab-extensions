@@ -119,7 +119,9 @@ async function runCode(path: string) {
 
   const env = await getEnvs()
 
-  const request = await uploadRequest(env.user, env.token)
+  const url = env.url.replace("/"+env.jobID, "")
+
+  const request = await uploadRequest(env.user, env.token, url)
 
   const cid = await uploadCode(
       request.upload_url,
