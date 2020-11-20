@@ -4,10 +4,11 @@ interface ITaskEnv {
     user: string
     token: string
     url: string
+    jobID: string
 }
 
-function Env(user: string, token: string, url: string): ITaskEnv {
-    return { user, token, url }
+function Env(user: string, token: string, url: string, jobID: string): ITaskEnv {
+    return { user, token, url, jobID}
 }
 
 export async function getEnvs(): Promise<ITaskEnv> {
@@ -30,7 +31,12 @@ export async function getEnvs(): Promise<ITaskEnv> {
         user = (user as string).slice(1, user.length - 1)
     }
 
-    return Env(user, token, url)
+    let id = await getBackend(kernel, 'OPENBAYES_JOB_ID')
+    if (id.length >= 2) {
+        id = (id as string).slice(1, id.length - 1)
+    }
+
+    return Env(user, token, url, id)
 }
 
 async function getBackend(
