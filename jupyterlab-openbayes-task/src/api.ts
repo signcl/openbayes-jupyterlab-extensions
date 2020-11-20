@@ -36,23 +36,22 @@ export async function uploadCode(
     const response = await fetch(url, {
         method: 'post',
         headers: {
-            authorization: token,
-            accept: 'application/json',
-            'content-type': 'multipart/form-data'
+            authorization: 'Bearer ' +token,
+            accept: 'application/json'
         },
         body: formData
     })
 
-
     const resp = await response.json()
-    console.log(resp)
 
-    if (response.status === 200) {
-        const location = await response.headers.get('Location')
-        return location.replace(url, '')
-    }
+    return resp.id
+    // if (response.status === 200) {
+    //     const location = await response.headers.get('Location')
+    //     console.log(location)
+    //     return location.replace(url, '')
+    // }
 
-    return ''
+    // return ''
 }
 
 export async function getJobDetail(url: string, token: string) {
@@ -83,7 +82,12 @@ export async function run(
 ) {
 
     // how to get datasets?
-    // const bindings = job.datasets
+    const bindings = job.datasets.map((item:any)=>{
+        return {
+            name:`${item.user_id}/${item.name}`,
+            path: item.path
+        }
+    })
 
     const response = await fetch(url, {
         method: 'post',
@@ -97,7 +101,7 @@ export async function run(
             'mode': 'TASK',
             'code': cid,
             'command': command,
-            // 'datasets': bindings,
+            'datasets': bindings,
             'runtime': job.runtime.framework+"-"+job.runtime.version,
             'resource': job.resource.name,
         })
