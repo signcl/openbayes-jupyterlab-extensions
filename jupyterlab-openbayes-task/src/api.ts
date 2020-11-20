@@ -21,8 +21,6 @@ export async function uploadCode(
     filename: string = 'main.py'
 ) {
 
-    // can not use fs.readFile
-    // const data = await fs.readFile(path, "utf8");
     const data = path
 
     // formData is not working
@@ -80,12 +78,15 @@ export async function run(
     command: string,
     job: any
 ) {
-
-    // how to get datasets?
-    const bindings = job.datasets.map((item:any)=>{
-        return {
-            name:`${item.user_id}/${item.name}`,
-            path: item.path
+    // todo: handle dataset
+    let bindings = job.datasets.map((item:any)=>{
+        if (item.job_id === job.id && item.path === "/output") {
+            return ''
+        } else {
+            return {
+                name: item.semantic_binding_name,
+                path: item.path
+            }
         }
     })
 
