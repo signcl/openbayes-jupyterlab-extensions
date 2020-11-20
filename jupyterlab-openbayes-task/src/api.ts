@@ -55,19 +55,35 @@ export async function uploadCode(
     return ''
 }
 
+export async function getJobDetail(url: string, token: string) {
+    if (url === '' || token === '') {
+        return
+    }
+    const response = await fetch(url, {
+        method: 'get',
+        headers: {
+            authorization: 'Bearer ' + token,
+            accept: 'application/json',
+            'content-type': 'application/json'
+        }
+    })
+    if (response.status === 200) {
+        return await response.json()
+    }
+    return
+}
+
 export async function run(
     user: string,
     token: string,
     url: string,
     cid: string,
     command: string,
-    datasets: any
+    job: any
 ) {
-    let formData = new FormData()
-    formData.append('code', cid)
-    formData.append('command', command)
-    formData.append('datasets', datasets)
-    formData.append('mode', 'TASK')
+
+    // how to get datasets?
+    // const bindings = job.datasets
 
     const response = await fetch(url, {
         method: 'post',
@@ -76,12 +92,21 @@ export async function run(
             accept: 'application/json',
             'content-type': 'application/json'
         },
-        body: formData
+        body: JSON.stringify({
+            'project_id': job.project_id,
+            'mode': 'TASK',
+            'code': cid,
+            'command': command,
+            // 'datasets': bindings,
+            'runtime': job.runtime.framework+"-"+job.runtime.version,
+            'resource': job.resource.name,
+        })
     })
 
     if (response.status === 200) {
         return await response.json()
     }
+
     return {}
 }
 
