@@ -70,6 +70,11 @@ export async function getJobDetail(url: string, token: string) {
     return
 }
 
+type DatasetBindings = {
+  name:string;
+  path:string;
+}
+
 export async function run(
     user: string,
     token: string,
@@ -78,17 +83,15 @@ export async function run(
     command: string,
     job: any
 ) {
-    // todo: handle dataset
-    let bindings = job.datasets.map((item:any)=>{
-        if (item.job_id === job.id && item.path === "/output") {
-            return ''
-        } else {
-            return {
+    let datasets:Array<DatasetBindings> = [];
+    job.datasets.forEach((item:any) => {
+        if (item.job_id !== job.id || item.path !== "/output") {
+            datasets.push({
                 name: item.semantic_binding_name,
                 path: item.path
-            }
+            })
         }
-    })
+    });
 
     const response = await fetch(url, {
         method: 'post',
@@ -102,7 +105,7 @@ export async function run(
             'mode': 'TASK',
             'code': cid,
             'command': command,
-            'datasets': bindings,
+            'datasets': datasets,
             'runtime': job.runtime.framework+"-"+job.runtime.version,
             'resource': job.resource.name,
         })
