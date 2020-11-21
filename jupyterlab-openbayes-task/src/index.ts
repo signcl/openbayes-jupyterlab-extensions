@@ -15,7 +15,7 @@ import { DocumentManager, renameDialog } from '@jupyterlab/docmanager'
 import { LeftPanelWidget } from './app'
 
 import {run, uploadRequest, uploadCode, getJobDetail} from './api'
-// import { getEnvs } from "./env";
+import { getEnvs } from "./env";
 
 export const NAMESPACE = 'openbayes-task'
 
@@ -117,13 +117,7 @@ const extension: JupyterFrontEndPlugin<void> = {
 
 async function runCode(path: string) {
 
-  // const env = await getEnvs()
-  const env = {
-    url:'https://dev.openbayes.com/api/users/aisensiy/jobs/intp52qjdkoy',
-    jobID:'intp52qjdkoy',
-    user:'aisensiy',
-    token:'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJhaXNlbnNpeSIsImV4cCI6MTY3MjIzMTM5N30.dCaYbBxOl4aHICq2h_eY75_CwdnoPeUlSVBStzt0SoeDbiwEnAwc_-AZ6hsHrFIpgxbzmoBRa4xBmNOJO8ZxuQ'
-  }
+  const env = await getEnvs()
 
   const url = env.url.replace("/"+env.jobID, "")
 
