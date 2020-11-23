@@ -20,14 +20,12 @@ export async function uploadCode(
     path: string,
     filename: string = 'main.py'
 ) {
+    let data = await (await fetch(path)).blob()
 
-    const data = path
-
-    // formData is not working
     let formData = new FormData()
     formData.append(
         'file',
-        new Blob(stringToBytes(data), { type: 'text/plain' }),
+        data,
         filename
     )
 
@@ -43,13 +41,7 @@ export async function uploadCode(
     const resp = await response.json()
 
     return resp.id
-    // if (response.status === 200) {
-    //     const location = await response.headers.get('Location')
-    //     console.log(location)
-    //     return location.replace(url, '')
-    // }
 
-    // return ''
 }
 
 export async function getJobDetail(url: string, token: string) {
@@ -118,28 +110,3 @@ export async function run(
     return {}
 }
 
-function stringToBytes(str: string) {
-    const bytes = new Array()
-    let len, c
-    len = str.length
-    for (let i = 0; i < len; i++) {
-        c = str.charCodeAt(i)
-        if (c >= 0x010000 && c <= 0x10ffff) {
-            bytes.push(((c >> 18) & 0x07) | 0xf0)
-            bytes.push(((c >> 12) & 0x3f) | 0x80)
-            bytes.push(((c >> 6) & 0x3f) | 0x80)
-            bytes.push((c & 0x3f) | 0x80)
-        } else if (c >= 0x000800 && c <= 0x00ffff) {
-            bytes.push(((c >> 12) & 0x0f) | 0xe0)
-            bytes.push(((c >> 6) & 0x3f) | 0x80)
-            bytes.push((c & 0x3f) | 0x80)
-        } else if (c >= 0x000080 && c <= 0x0007ff) {
-            bytes.push(((c >> 6) & 0x1f) | 0xc0)
-            bytes.push((c & 0x3f) | 0x80)
-        } else {
-            bytes.push(c & 0xff)
-        }
-    }
-
-    return bytes
-}

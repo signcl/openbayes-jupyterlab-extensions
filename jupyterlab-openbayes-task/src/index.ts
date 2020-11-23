@@ -10,6 +10,10 @@ import { INotebookTracker } from '@jupyterlab/notebook'
 
 import { isCodeCellModel } from '@jupyterlab/cells'
 
+import {
+  IFileBrowserFactory
+} from '@jupyterlab/filebrowser';
+
 import { DocumentManager, renameDialog } from '@jupyterlab/docmanager'
 
 import { LeftPanelWidget } from './app'
@@ -28,11 +32,13 @@ const extension: JupyterFrontEndPlugin<void> = {
   requires: [
       ILayoutRestorer,
     INotebookTracker,
+    IFileBrowserFactory
   ],
   activate: (
     app: JupyterFrontEnd,
     restorer: ILayoutRestorer,
-    tracker: INotebookTracker
+    tracker: INotebookTracker,
+    factory: IFileBrowserFactory
   ) => {
     console.log('JupyterLab extension jupyterlab-openbayes-task is activated!')
 
@@ -95,8 +101,8 @@ const extension: JupyterFrontEndPlugin<void> = {
 
         if (model !== undefined) {
           console.log("path: " + model.path + ", name: " + model.name)
-          // await runCode(model.path)
-          await runCode(codes)
+          const path = await getCodeURL(factory,model.path)
+          await runCode(path)
         }
 
       }
@@ -135,6 +141,13 @@ async function runCode(path: string) {
   return await run(env.user, env.token, url, cid, 'python main.py', job)
 }
 
+function getCodeURL (factory:IFileBrowserFactory,path:string){
+  const { tracker } = factory;
+  const widget = tracker.currentWidget
+  return widget.model.manager.services.contents
+    .getDownloadUrl(path)
+    
+}
 export default extension
 
 namespace Private {
