@@ -16,7 +16,7 @@ import {
 
 import { DocumentManager, renameDialog } from '@jupyterlab/docmanager'
 
-import { LeftPanelWidget } from './app'
+import { LeftPanelWidget,SelectTypeExtension } from './app'
 
 import {run, uploadRequest, uploadCode, getJobDetail} from './api'
 import { getEnvs } from "./env";
@@ -31,8 +31,8 @@ const extension: JupyterFrontEndPlugin<void> = {
   autoStart: true,
   requires: [
       ILayoutRestorer,
-    INotebookTracker,
-    IFileBrowserFactory
+      INotebookTracker,
+      IFileBrowserFactory
   ],
   activate: (
     app: JupyterFrontEnd,
@@ -117,6 +117,8 @@ const extension: JupyterFrontEndPlugin<void> = {
     restorer.add(widget, NAMESPACE)
     app.shell.add(widget, 'left', { rank: 101 })
 
+    let select = new SelectTypeExtension();
+    app.docRegistry.addWidgetExtension('Notebook', select);
     return
   }
 }
