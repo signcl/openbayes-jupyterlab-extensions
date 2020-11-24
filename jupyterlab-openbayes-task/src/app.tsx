@@ -1,7 +1,7 @@
 import React, { useState } from 'react'
 import * as ReactDOM from 'react-dom'
 import { Widget } from '@lumino/widgets'
-import { Switch} from '@material-ui/core'
+import { Switch } from '@material-ui/core'
 
 
 import {
@@ -73,11 +73,8 @@ class SelectTypeWidget extends Widget{
   }
 }
 const SelectTypeComponent = ()=>{
-  const [value,setValue] = useState('-')
+  const [value,setValue] = useState('Default')
   const handleChange = (event:React.ChangeEvent<HTMLSelectElement>)=>{
-    if (event.target.value !== '-') {
-      console.log('select active')
-    }
     setValue(event.target.value)
   }
   return (
@@ -87,9 +84,8 @@ const SelectTypeComponent = ()=>{
       value={value}
       aria-label='Select'
     >
-      <option value="-">-</option>
-      <option value="all">All Select</option>
-      <option value="multi">Multi Select</option>
+      <option value="Default">Default</option>
+      <option value="Task">Task</option>
     </HTMLSelect>
   );
 }
