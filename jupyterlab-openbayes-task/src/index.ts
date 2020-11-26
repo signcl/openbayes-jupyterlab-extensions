@@ -16,7 +16,9 @@ import {
 
 import { DocumentManager, renameDialog } from '@jupyterlab/docmanager'
 
-import { LeftPanelWidget,SelectTypeExtension } from './app'
+import { Cell } from '@jupyterlab/cells';
+
+import { LeftPanelWidget,SelectTypeExtension,AddSelectButton,INotebookSelectRecords,INotebookSelectButtons } from './app'
 
 import {run, uploadRequest, uploadCode, getJobDetail} from './api'
 import { getEnvs } from "./env";
@@ -119,6 +121,44 @@ const extension: JupyterFrontEndPlugin<void> = {
 
     let select = new SelectTypeExtension();
     app.docRegistry.addWidgetExtension('Notebook', select);
+
+    tracker.currentChanged.connect(() => {
+
+      const notebookPanel = tracker.currentWidget;
+
+      if (notebookPanel === null) {
+        return
+      }
+
+      const notebook = tracker.currentWidget.content;
+      const cellTracker:INotebookSelectButtons = {};
+      const cellRecords:INotebookSelectRecords = {};
+      notebookPanel.context.ready.then(async () => {
+        // Iterate over all code cells and create a collapser
+        // for each that exists
+        notebook.widgets.map((c: Cell) => {
+          AddSelectButton(c,cellTracker,cellRecords);
+        });
+
+        tracker.activeCellChanged.connect(() => {
+          const cell: Cell = notebook.activeCell;
+          if (cell !== null) {
+            AddSelectButton(cell,cellTracker,cellRecords);
+          }
+        });
+
+      });
+
+    })
+
+    // 这里不是立刻获取到，需要等待
+    // const nbWidget = tracker.currentWidget;
+    // let selected_cells = nbWidget.notebook.widgets.filter(
+    //     cell => nbWidget.notebook.isSelected(cell)
+    // );
+    // let contents = selected_cells.map(
+    //     cell => cell.model.value.text
+    // );
     return
   }
 }
@@ -150,6 +190,7 @@ function getCodeURL (factory:IFileBrowserFactory,path:string){
     .getDownloadUrl(path)
     
 }
+
 export default extension
 
 namespace Private {

@@ -1,7 +1,7 @@
-import React, { useState } from 'react'
+import React, { useState,useEffect } from 'react'
 import * as ReactDOM from 'react-dom'
 import { Widget } from '@lumino/widgets'
-import { Switch } from '@material-ui/core'
+import { Button, Switch } from '@material-ui/core'
 
 
 import {
@@ -19,6 +19,12 @@ import {
 import {
   HTMLSelect
 } from '@jupyterlab/ui-components';
+
+import {
+  Cell
+} from '@jupyterlab/cells';
+
+import { PanelLayout } from '@lumino/widgets';
 
 const TOOLBAR_CELLTYPE_DROPDOWN_CLASS = 'jp-Notebook-toolbarCellTypeDropdown';
 export interface IProps {
@@ -88,5 +94,81 @@ const SelectTypeComponent = ()=>{
       <option value="Task">Task</option>
     </HTMLSelect>
   );
+}
+
+export const AddSelectButton = (cell: Cell,tracker: INotebookSelectButtons,record:INotebookSelectRecords) => {
+  if (cell.model.type === 'code' && !tracker[cell.model.id]) {
+    const selectButton = new SelectButtonWidget({
+      id:cell.model.id,
+      cell,
+      record,
+    });
+    tracker[cell.model.id] = selectButton;
+    (cell.inputArea.layout as PanelLayout).insertWidget(0, selectButton);
+  } else {
+    (cell.inputArea.layout as PanelLayout).removeWidget(tracker[cell.model.id]);
+    delete tracker[cell.model.id];
+    const selectButton = new SelectButtonWidget({
+      id:cell.model.id,
+      cell,
+      record,
+    });
+    tracker[cell.model.id] = selectButton;
+    (cell.inputArea.layout as PanelLayout).insertWidget(0, selectButton);
+  }
+};
+
+export interface INotebookSelectRecords {
+  [id: string]: string;
+}
+export interface INotebookSelectButtons {
+  [id: string]: SelectButtonWidget;
+}
+interface ISelectButtonProps {
+  id:any;
+  cell:Cell;
+  record:INotebookSelectRecords;
+}
+class SelectButtonWidget extends Widget{
+  constructor(props:ISelectButtonProps) {
+    super()
+    ReactDOM.render(<SelectButton {...props} />, this.node)
+  }
+}
+const SelectButton = ({id,cell,record}:ISelectButtonProps)=>{
+  const [index,setIndex] = useState(0)
+  const [recordList,setRecordList] = useState(record)
+
+  useEffect(()=>{
+    console.log('组件中收到的记录值',recordList)
+    let list = Object.keys(recordList)
+    console.log(list)
+    let Index = list.findIndex((item:string) =>item === id);
+    let order = Index < 0 ? 0 : Index+1;
+    setIndex(order)
+  },[id,recordList])
+  
+  const SaveSelectCellID = ()=>{
+    console.log('选中cell')
+    record[cell.model.id] = cell.model.id;
+    setRecordList(record)
+    console.log(record)
+  }
+  const DeleteSelectCellID = ()=>{
+    console.log('取消选中cell')
+    delete record[cell.model.id]
+    setRecordList(record)
+  }
+
+  if(!index) return(
+    <Button 
+      size="small" 
+      variant="contained" 
+      title="Select" 
+      onClick={SaveSelectCellID}
+      >select</Button>)
+  return(
+    <Button size="small" variant="contained" color="primary" onClick={DeleteSelectCellID}>{index}</Button>
+    )
 }
 
