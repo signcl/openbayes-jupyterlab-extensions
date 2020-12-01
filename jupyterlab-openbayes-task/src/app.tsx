@@ -137,27 +137,31 @@ class SelectButtonWidget extends Widget{
 }
 const SelectButton = ({id,cell,record}:ISelectButtonProps)=>{
   const [index,setIndex] = useState(0)
-  const [recordList,setRecordList] = useState(record)
 
   useEffect(()=>{
-    console.log('组件中收到的记录值',recordList)
-    let list = Object.keys(recordList)
-    console.log(list)
+    let list = Object.keys(record)
     let Index = list.findIndex((item:string) =>item === id);
     let order = Index < 0 ? 0 : Index+1;
     setIndex(order)
-  },[id,recordList])
+  },[id,record])
   
   const SaveSelectCellID = ()=>{
     console.log('选中cell')
-    record[cell.model.id] = cell.model.id;
-    setRecordList(record)
     console.log(record)
+    record[cell.model.id] = cell.model.id;
+    changeIndex()
   }
   const DeleteSelectCellID = ()=>{
     console.log('取消选中cell')
     delete record[cell.model.id]
-    setRecordList(record)
+    changeIndex()
+  }
+
+  const changeIndex = ()=>{
+    let list = Object.keys(record)
+    let Index = list.findIndex((item:string) =>item === id);
+    let order = Index < 0 ? 0 : Index+1;
+    setIndex(order)
   }
 
   if(!index) return(

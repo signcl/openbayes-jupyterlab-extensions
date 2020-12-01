@@ -140,12 +140,12 @@ const extension: JupyterFrontEndPlugin<void> = {
           AddSelectButton(c,cellTracker,cellRecords);
         });
 
-        tracker.activeCellChanged.connect(() => {
-          const cell: Cell = notebook.activeCell;
-          if (cell !== null) {
-            AddSelectButton(cell,cellTracker,cellRecords);
-          }
-        });
+        // tracker.activeCellChanged.connect(() => {
+        //   // 每次选中的 cell 发生变化，刷新全部的 celllist，问题：会有性能浪费
+        //   notebook.widgets.map((c: Cell) => {
+        //     AddSelectButton(c,cellTracker,cellRecords);
+        //   });
+        // });
 
       });
 
