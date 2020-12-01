@@ -84,15 +84,25 @@ const SelectTypeComponent = ()=>{
     setValue(event.target.value)
   }
   return (
-    <HTMLSelect
-      className={TOOLBAR_CELLTYPE_DROPDOWN_CLASS}
-      onChange={handleChange}
-      value={value}
-      aria-label='Select'
-    >
-      <option value="Default">Default</option>
-      <option value="Task">Task</option>
-    </HTMLSelect>
+    <React.Fragment>
+      <HTMLSelect
+        className={TOOLBAR_CELLTYPE_DROPDOWN_CLASS}
+        onChange={handleChange}
+        value={value}
+        aria-label='Select'
+      >
+        <option value="Default">Default</option>
+        <option value="Task">Task</option>
+      </HTMLSelect>
+      {
+        value === 'Task' && 
+        <React.Fragment>
+          <Button size="small">Save</Button>
+          <Button size="small">Cancel</Button>
+        </React.Fragment>
+      }
+    </React.Fragment>
+    
   );
 }
 
@@ -101,7 +111,7 @@ export const AddSelectButton = (cell: Cell,tracker: INotebookSelectButtons,recor
     const selectButton = new SelectButtonWidget({
       id:cell.model.id,
       cell,
-      record,
+      record
     });
     tracker[cell.model.id] = selectButton;
     (cell.inputArea.layout as PanelLayout).insertWidget(0, selectButton);
@@ -136,43 +146,43 @@ class SelectButtonWidget extends Widget{
   }
 }
 const SelectButton = ({id,cell,record}:ISelectButtonProps)=>{
-  const [index,setIndex] = useState(0)
-
-  useEffect(()=>{
-    let list = Object.keys(record)
-    let Index = list.findIndex((item:string) =>item === id);
-    let order = Index < 0 ? 0 : Index+1;
-    setIndex(order)
-  },[id,record])
+  const [isSelected, setIsSelected] = useState(false);
+  const metadata = cell.model.metadata;
+  console.log(metadata)
   
-  const SaveSelectCellID = ()=>{
-    console.log('选中cell')
-    console.log(record)
-    record[cell.model.id] = cell.model.id;
-    changeIndex()
-  }
-  const DeleteSelectCellID = ()=>{
-    console.log('取消选中cell')
-    delete record[cell.model.id]
-    changeIndex()
+  useEffect(()=>{
+    const initiallySelected = metadata.get('isSelect') as boolean;
+
+    if (initiallySelected) {
+      setIsSelected(initiallySelected);
+    }
+  },[])
+
+  const handelClick = ()=>{
+    if(!isSelected){
+      record[cell.model.id] = cell.model.id;
+      console.log('选中cell',record)
+      metadata.set('isSelect', true);
+    } else {
+      delete record[cell.model.id]
+      metadata.delete('isSelect');
+    }
+    setIsSelected(!isSelected);
   }
 
-  const changeIndex = ()=>{
-    let list = Object.keys(record)
-    let Index = list.findIndex((item:string) =>item === id);
-    let order = Index < 0 ? 0 : Index+1;
-    setIndex(order)
-  }
-
-  if(!index) return(
+  if(!isSelected) return(
     <Button 
       size="small" 
       variant="contained" 
       title="Select" 
-      onClick={SaveSelectCellID}
+      onClick={handelClick}
       >select</Button>)
   return(
-    <Button size="small" variant="contained" color="primary" onClick={DeleteSelectCellID}>{index}</Button>
+    <Button size="small" variant="contained" color="primary" onClick={handelClick}>
+      {
+      Object.keys(record).findIndex((item:string) =>item === id)+1
+      }
+    </Button>
     )
 }
 

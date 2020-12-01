@@ -133,15 +133,18 @@ const extension: JupyterFrontEndPlugin<void> = {
       const notebook = tracker.currentWidget.content;
       const cellTracker:INotebookSelectButtons = {};
       const cellRecords:INotebookSelectRecords = {};
+      // notebook.cellRecords = cellRecords
       notebookPanel.context.ready.then(async () => {
-        // Iterate over all code cells and create a collapser
+        // Iterate over all code cells and create a select
         // for each that exists
+        
+        notebook.model.metadata.set('cellRecords',cellRecords)
+        console.log(notebook)
         notebook.widgets.map((c: Cell) => {
           AddSelectButton(c,cellTracker,cellRecords);
         });
-
-        // tracker.activeCellChanged.connect(() => {
-        //   // 每次选中的 cell 发生变化，刷新全部的 celllist，问题：会有性能浪费
+        // notebook.stateChanged.connect(() => {
+        //   // 当前的 cell 模式发生变化
         //   notebook.widgets.map((c: Cell) => {
         //     AddSelectButton(c,cellTracker,cellRecords);
         //   });
