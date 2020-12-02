@@ -75,13 +75,28 @@ class SelectTypeExtension implements DocumentRegistry.IWidgetExtension<NotebookP
 class SelectTypeWidget extends Widget{
   constructor(widget: Notebook) {
     super()
-    ReactDOM.render(<SelectTypeComponent  />, this.node)
+    ReactDOM.render(<SelectTypeComponent  notebook={widget}/>, this.node)
   }
 }
-const SelectTypeComponent = ()=>{
-  const [value,setValue] = useState('Default')
+const SelectTypeComponent = ({notebook}:{notebook:Notebook})=>{
+  const [value,setValue] = useState('Default');
+  const cellTracker = {};
+  const cellRecords:INotebookSelectRecords = {};
+  
   const handleChange = (event:React.ChangeEvent<HTMLSelectElement>)=>{
-    setValue(event.target.value)
+    let selectValue = event.target.value
+    setValue(selectValue)
+    if(selectValue === 'Task'){
+      notebook.model.metadata.set('cellRecords',cellRecords);
+      notebook.model.metadata.set('cellTracker',cellTracker);
+      notebook.widgets.map((c: Cell) => {
+        AddSelectButton(c,notebook.model);
+      });
+    } else {
+      notebook.widgets.map((c: Cell) => {
+        RemoveSelectButton(c);
+      });
+    }
   }
   return (
     <React.Fragment>
@@ -105,28 +120,46 @@ const SelectTypeComponent = ()=>{
     
   );
 }
-
-export const AddSelectButton = (cell: Cell,tracker: INotebookSelectButtons,record:INotebookSelectRecords) => {
+/**
+ * @description: 增加选择 button
+ * @param {cell,model}
+ * @return {null}
+ */
+export const AddSelectButton = (cell: Cell,model:INotebookModel) => {
+  const base = model.metadata.get('cellTracker')
+  let tracker:any = Object.assign({},base)
   if (cell.model.type === 'code' && !tracker[cell.model.id]) {
     const selectButton = new SelectButtonWidget({
       id:cell.model.id,
       cell,
-      record
+      model
     });
     tracker[cell.model.id] = selectButton;
     (cell.inputArea.layout as PanelLayout).insertWidget(0, selectButton);
+    model.metadata.set('cellTracker',tracker)
   } else {
     (cell.inputArea.layout as PanelLayout).removeWidget(tracker[cell.model.id]);
     delete tracker[cell.model.id];
     const selectButton = new SelectButtonWidget({
       id:cell.model.id,
       cell,
-      record,
+      model,
     });
     tracker[cell.model.id] = selectButton;
     (cell.inputArea.layout as PanelLayout).insertWidget(0, selectButton);
+    model.metadata.set('cellTracker',tracker)
   }
 };
+/**
+ * @description: 移除选择 button
+ * @param {cell}
+ * @return {null}
+ */
+export const RemoveSelectButton = (cell: Cell) => {
+  if (cell.model.type === 'code') {
+    (cell.inputArea.layout as PanelLayout).removeWidgetAt(0);
+  }
+}
 
 export interface INotebookSelectRecords {
   [id: string]: string;
@@ -137,7 +170,7 @@ export interface INotebookSelectButtons {
 interface ISelectButtonProps {
   id:any;
   cell:Cell;
-  record:INotebookSelectRecords;
+  model:INotebookModel;
 }
 class SelectButtonWidget extends Widget{
   constructor(props:ISelectButtonProps) {
@@ -145,28 +178,35 @@ class SelectButtonWidget extends Widget{
     ReactDOM.render(<SelectButton {...props} />, this.node)
   }
 }
-const SelectButton = ({id,cell,record}:ISelectButtonProps)=>{
+const SelectButton = ({id,cell,model}:ISelectButtonProps)=>{
   const [isSelected, setIsSelected] = useState(false);
+  const [record,setRecord] = useState(null);
   const metadata = cell.model.metadata;
-  console.log(metadata)
   
   useEffect(()=>{
-    const initiallySelected = metadata.get('isSelect') as boolean;
-
-    if (initiallySelected) {
-      setIsSelected(initiallySelected);
-    }
-  },[])
+    model.metadata.changed.connect(()=>{
+      const initiallySelected = metadata.get('isSelect') as boolean;
+      const list = model.metadata.get('cellRecords');
+      setRecord(Object.assign({}, list))
+      const index = Object.keys(list).findIndex((item:string) =>item === id)
+      if (initiallySelected && index !== -1) {
+        setIsSelected(initiallySelected);
+      }
+    })
+  },[model])
 
   const handelClick = ()=>{
+    const list = model.metadata.get('cellRecords')
+    const record:any = Object.assign({}, list);
     if(!isSelected){
       record[cell.model.id] = cell.model.id;
-      console.log('选中cell',record)
       metadata.set('isSelect', true);
     } else {
       delete record[cell.model.id]
       metadata.delete('isSelect');
     }
+    model.metadata.set('cellRecords',record)
+    setRecord(record)
     setIsSelected(!isSelected);
   }
 
