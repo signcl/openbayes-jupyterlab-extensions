@@ -16,9 +16,8 @@ import {
 
 import { DocumentManager, renameDialog } from '@jupyterlab/docmanager'
 
-import { Cell } from '@jupyterlab/cells';
 
-import { LeftPanelWidget,SelectTypeExtension,AddSelectButton,INotebookSelectRecords,INotebookSelectButtons } from './app'
+import { LeftPanelWidget,SelectTypeExtension } from './app'
 
 import {run, uploadRequest, uploadCode, getJobDetail} from './api'
 import { getEnvs } from "./env";
@@ -129,29 +128,6 @@ const extension: JupyterFrontEndPlugin<void> = {
       if (notebookPanel === null) {
         return
       }
-
-      const notebook = tracker.currentWidget.content;
-      const cellTracker:INotebookSelectButtons = {};
-      const cellRecords:INotebookSelectRecords = {};
-      // notebook.cellRecords = cellRecords
-      notebookPanel.context.ready.then(async () => {
-        // Iterate over all code cells and create a select
-        // for each that exists
-        
-        notebook.model.metadata.set('cellRecords',cellRecords)
-        console.log(notebook)
-        notebook.widgets.map((c: Cell) => {
-          AddSelectButton(c,cellTracker,cellRecords);
-        });
-        // notebook.stateChanged.connect(() => {
-        //   // 当前的 cell 模式发生变化
-        //   notebook.widgets.map((c: Cell) => {
-        //     AddSelectButton(c,cellTracker,cellRecords);
-        //   });
-        // });
-
-      });
-
     })
 
     // 这里不是立刻获取到，需要等待
