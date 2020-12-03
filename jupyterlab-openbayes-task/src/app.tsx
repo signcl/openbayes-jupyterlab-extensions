@@ -2,8 +2,6 @@ import React, { useState,useEffect } from 'react'
 import * as ReactDOM from 'react-dom'
 import { Widget } from '@lumino/widgets'
 import { Button, Switch } from '@material-ui/core'
-
-
 import {
   IDisposable, DisposableDelegate
 } from '@lumino/disposable';
@@ -26,7 +24,8 @@ import {
 
 import { PanelLayout } from '@lumino/widgets';
 
-const TOOLBAR_CELLTYPE_DROPDOWN_CLASS = 'jp-Notebook-toolbarCellTypeDropdown';
+const TOOLBAR_SELECTTYPE_DROPDOWN_CLASS = 'jp-Notebook-toolbarCellTypeDropdown select';
+const TOOLBAR_SELECT_BUTTON_CLASS = 'select-button';
 export interface IProps {
   runCodes?: () => void
 }
@@ -85,8 +84,7 @@ const SelectTypeComponent = ({panel,notebook}:{panel:NotebookPanel,notebook:Note
     let selectValue = event.target.value
     setValue(selectValue)
     if(selectValue === 'Task'){
-      let children = panel.toolbar.children()
-      console.log(children)
+      // let children = panel.toolbar.children()
       // 设置初始值
       notebook.model.metadata.set('cellRecords','{}');
       notebook.widgets.map((c: Cell) => {
@@ -102,7 +100,7 @@ const SelectTypeComponent = ({panel,notebook}:{panel:NotebookPanel,notebook:Note
   return (
     <React.Fragment>
       <HTMLSelect
-        className={TOOLBAR_CELLTYPE_DROPDOWN_CLASS}
+        className={TOOLBAR_SELECTTYPE_DROPDOWN_CLASS}
         onChange={handleChange}
         value={value}
         aria-label='Select'
@@ -112,9 +110,9 @@ const SelectTypeComponent = ({panel,notebook}:{panel:NotebookPanel,notebook:Note
       </HTMLSelect>
       {
         value === 'Task' && 
-        <div>
+        <div className={TOOLBAR_SELECT_BUTTON_CLASS}>
           {/* 在这一步保存生成文件 */}
-          <Button size="small">Save</Button>
+          Save
         </div>
       }
     </React.Fragment>
@@ -186,10 +184,7 @@ const SelectButton = ({id,cell,model}:ISelectButtonProps)=>{
   const metadata = cell.model.metadata;
 
   useEffect(()=>{
-    let initCellRecords = JSON.parse(model.metadata.get('cellRecords').toString())
-    console.log('初始渲染recordslist',initCellRecords)
     model.metadata.changed.connect(()=>{
-      console.log('metadata发生变化')
       const initiallySelected = metadata.get('isSelect') as boolean;
       const list = JSON.parse(model.metadata.get('cellRecords').toString());
       setRecord(list)
@@ -212,7 +207,6 @@ const SelectButton = ({id,cell,model}:ISelectButtonProps)=>{
     }
     let resultRecord = JSON.stringify(record)
     model.metadata.set('cellRecords',resultRecord)
-    console.log(model.metadata.get('cellRecords'))
     setRecord(record)
     setIsSelected(!isSelected);
   }
