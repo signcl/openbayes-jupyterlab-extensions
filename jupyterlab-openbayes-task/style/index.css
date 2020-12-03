@@ -12,6 +12,7 @@
 [data-jp-theme-light="true"] .task-icon {
   --task-icon: var(--task-icon-light);
 }
+
 [data-jp-theme-light="false"] .task-icon {
   --task-icon: var(--task-icon-dark);
 }
@@ -99,4 +100,31 @@
   text-transform: uppercase;
   color: var(--text-color);
   background: var(--text-color-10);
+}
+
+.select {
+  position: relative;
+}
+
+.select-button {
+  font-family: var(--jp-ui-font-family);
+  min-height: 1.2em;
+  padding: 0px 5px;
+  border-radius: 2px;
+  font-size: 12px;
+  line-height: 24px;
+}
+
+[data-jp-theme-light="true"] .select-button {
+  background-color: var(--white);
+  color: var(--dark);
+}
+
+[data-jp-theme-light="true"] .select-button:hover {
+  background-color: var(--light);
+}
+
+[data-jp-theme-light="false"] .select-button {
+  background-color: var(--gray-dark);
+  color: var(--white);
 }
