@@ -1,7 +1,7 @@
 import React, { useState,useEffect } from 'react'
 import * as ReactDOM from 'react-dom'
 import { Widget } from '@lumino/widgets'
-import { Button, Switch } from '@material-ui/core'
+import { Switch } from '@material-ui/core';
 import {
   IDisposable, DisposableDelegate
 } from '@lumino/disposable';
@@ -25,7 +25,9 @@ import {
 import { PanelLayout } from '@lumino/widgets';
 
 const TOOLBAR_SELECTTYPE_DROPDOWN_CLASS = 'jp-Notebook-toolbarCellTypeDropdown select';
+const TOOLBAR_SAVE_BUTTON_CLASS = 'save-button';
 const TOOLBAR_SELECT_BUTTON_CLASS = 'select-button';
+const TOOLBAR_SELECT_NUMBER_BUTTON_CLASS = 'select-number-button';
 export interface IProps {
   runCodes?: () => void
 }
@@ -74,11 +76,12 @@ class SelectTypeExtension implements DocumentRegistry.IWidgetExtension<NotebookP
 class SelectTypeWidget extends Widget{
   constructor(panel:NotebookPanel,widget: Notebook) {
     super()
-    ReactDOM.render(<SelectTypeComponent  notebook={widget} panel={panel}/>, this.node)
+    ReactDOM.render(<SelectTypeComponent  notebook={widget} panel={panel} />, this.node)
   }
 }
 const SelectTypeComponent = ({panel,notebook}:{panel:NotebookPanel,notebook:Notebook})=>{
   const [value,setValue] = useState('Default');
+  let tracker:INotebookSelectButtons = {}
   
   const handleChange = (event:React.ChangeEvent<HTMLSelectElement>)=>{
     let selectValue = event.target.value
@@ -88,7 +91,7 @@ const SelectTypeComponent = ({panel,notebook}:{panel:NotebookPanel,notebook:Note
       // 设置初始值
       notebook.model.metadata.set('cellRecords','{}');
       notebook.widgets.map((c: Cell) => {
-        AddSelectButton(c,notebook.model);
+        AddSelectButton(c,notebook.model,tracker);
       });
     } else {
       notebook.widgets.map((c: Cell) => {
@@ -110,7 +113,9 @@ const SelectTypeComponent = ({panel,notebook}:{panel:NotebookPanel,notebook:Note
       </HTMLSelect>
       {
         value === 'Task' && 
-        <div className={TOOLBAR_SELECT_BUTTON_CLASS}>
+        <div className={TOOLBAR_SAVE_BUTTON_CLASS}
+          // onClick={saveCode}
+        >
           {/* 在这一步保存生成文件 */}
           Save
         </div>
@@ -124,31 +129,19 @@ const SelectTypeComponent = ({panel,notebook}:{panel:NotebookPanel,notebook:Note
  * @param {cell,model}
  * @return {null}
  */
-export const AddSelectButton = (cell: Cell,model:INotebookModel) => {
-  // let tracker:any = model.metadata.get('cellTracker')
-  if (cell.model.type === 'code' ) {
-    // && !tracker[cell.model.id]
+export const AddSelectButton = (cell: Cell,model:INotebookModel,tracker:INotebookSelectButtons) => {
+  if (cell.model.type === 'code' && !tracker[cell.model.id]) {
     const selectButton = new SelectButtonWidget({
       id:cell.model.id,
       cell,
       model
     });
-    // tracker[cell.model.id] = selectButton;
-    (cell.inputArea.layout as PanelLayout).insertWidget(0, selectButton);
-    // model.metadata.set('cellTracker',tracker)
-  } 
-  // else {
-  //   (cell.inputArea.layout as PanelLayout).removeWidget(tracker[cell.model.id]);
-  //   delete tracker[cell.model.id];
-  //   const selectButton = new SelectButtonWidget({
-  //     id:cell.model.id,
-  //     cell,
-  //     model,
-  //   });
-  //   tracker[cell.model.id] = selectButton;
-  //   (cell.inputArea.layout as PanelLayout).insertWidget(0, selectButton);
-  //   model.metadata.set('cellTracker',tracker)
-  // }
+    tracker[cell.model.id] = selectButton;
+    selectButton.id = "Select-Button";
+    // (cell.inputArea.layout as PanelLayout).insertWidget(0, selectButton); 添加至左边第一个
+    // 将 widget 添加至末尾
+    (cell.inputArea.layout as PanelLayout).addWidget(selectButton);
+  }
 };
 /**
  * @description: 移除选择 button
@@ -157,7 +150,11 @@ export const AddSelectButton = (cell: Cell,model:INotebookModel) => {
  */
 export const RemoveSelectButton = (cell: Cell) => {
   if (cell.model.type === 'code') {
-    (cell.inputArea.layout as PanelLayout).removeWidgetAt(0);
+    (cell.inputArea.layout as PanelLayout).widgets.forEach(element => {
+      if(element.id === 'Select-Button'){
+        (cell.inputArea.layout as PanelLayout).removeWidget(element);
+      }
+    });
   }
 }
 
@@ -210,20 +207,24 @@ const SelectButton = ({id,cell,model}:ISelectButtonProps)=>{
     setRecord(record)
     setIsSelected(!isSelected);
   }
-
+  if(!metadata){
+    return;
+  }
   if(!isSelected) return(
-    <Button 
-      size="small" 
-      variant="contained" 
-      title="Select" 
+    <div 
+      title="Select"
+      className={TOOLBAR_SELECT_BUTTON_CLASS} 
       onClick={handelClick}
-      >select</Button>)
+    >
+      <svg focusable="false" viewBox="0 0 24 24" fill="none" aria-hidden="true" xmlns="http://www.w3.org/2000/svg"><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"></path></svg>
+    </div>
+    )
   return(
-    <Button size="small" variant="contained" color="primary" onClick={handelClick}>
+    <div className={TOOLBAR_SELECT_NUMBER_BUTTON_CLASS} onClick={handelClick}>
       {
       Object.keys(record).findIndex((item:string) =>item === id)+1
       }
-    </Button>
+    </div>
     )
 }
 
