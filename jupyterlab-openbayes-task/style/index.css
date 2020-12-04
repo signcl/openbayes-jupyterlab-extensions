@@ -1,4 +1,5 @@
 @import "./openbayes.css";
+@import url("~@jupyterlab/ui-components/style/index.css");
 
 :root {
   --indent: 1em;
@@ -106,7 +107,7 @@
   position: relative;
 }
 
-.select-button {
+.save-button {
   font-family: var(--jp-ui-font-family);
   min-height: 1.2em;
   padding: 0px 5px;
@@ -115,16 +116,67 @@
   line-height: 24px;
 }
 
-[data-jp-theme-light="true"] .select-button {
+[data-jp-theme-light="true"] .save-button {
   background-color: var(--white);
-  color: var(--dark);
+  color: var(--jp-ui-font-color1);
 }
 
-[data-jp-theme-light="true"] .select-button:hover {
-  background-color: var(--light);
+[data-jp-theme-light="true"] .save-button:hover {
+  background-color: var(--bg-color-light);
 }
 
-[data-jp-theme-light="false"] .select-button {
+[data-jp-theme-light="false"] .save-button:hover {
   background-color: var(--gray-dark);
   color: var(--white);
+}
+
+.select-button {
+  width: 40px;
+  height: 24px;
+  margin: 0 .5em;
+  border-radius: 4px;
+  border: .1em solid var(--link-color);
+  box-sizing: border-box;
+  color: var(--link-color);
+  cursor: pointer;
+  display: flex;
+  justify-content: center;
+  align-items: center; 
+}
+
+.select-button:hover {
+  border: .1em solid var(--link-color-60);
+  color: var(--link-color-60);
+}
+
+.select-button svg {
+  width: 24px;
+  height: 24px;
+}
+
+.select-button svg path {
+  fill: var(--link-color);
+}
+
+.select-button svg path:hover {
+  fill: var(--link-color-60);
+}
+
+.select-number-button {
+  width: 40px;
+  height: 24px;
+  margin: 0 .5em;
+  border-radius: 4px;
+  background-color: var(--link-color-40);
+  color: var(--link-color);
+  font-weight: 600;
+  cursor: pointer;
+  display: flex;
+  justify-content: center;
+  align-items: center; 
+}
+
+.select-number-button:hover {
+  background-color: var(--link-color-20);
+  color: var(--link-color-60);
 }
