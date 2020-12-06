@@ -118,7 +118,11 @@ const extension: JupyterFrontEndPlugin<void> = {
     restorer.add(widget, NAMESPACE)
     app.shell.add(widget, 'left', { rank: 101 })
 
-    let select = new SelectTypeExtension();
+    let select = new SelectTypeExtension({
+      runCodes:async () => {
+        // todo：保存选中的代码，需要区分 default 和 task
+      }
+    });
     app.docRegistry.addWidgetExtension('Notebook', select);
 
     tracker.currentChanged.connect(() => {

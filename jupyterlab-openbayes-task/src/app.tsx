@@ -67,19 +67,35 @@ const LeftPanelComponent = ({ runCodes }: { runCodes?: () => void }) => {
 
 export
 class SelectTypeExtension implements DocumentRegistry.IWidgetExtension<NotebookPanel, INotebookModel>{
+  saveCodes: () => void;
+  constructor(props: IProps = {}){
+    this.saveCodes = props.runCodes
+  }
   createNew(panel: NotebookPanel, context: DocumentRegistry.IContext<INotebookModel>): IDisposable {
-    let select = new SelectTypeWidget(panel,panel.content);
+    let select = new SelectTypeWidget({
+      panel,
+      notebook:panel.content,
+      saveCodes:this.saveCodes
+    });
     panel.toolbar.insertItem(8, 'select', select);
     return new DisposableDelegate(() => {});
   }
 }
+
+export interface SelectTypeProps {
+  panel:NotebookPanel;
+  notebook: Notebook;
+  saveCodes?:() => void;
+}
+
 class SelectTypeWidget extends Widget{
-  constructor(panel:NotebookPanel,widget: Notebook) {
+  constructor(props:SelectTypeProps) {
     super()
-    ReactDOM.render(<SelectTypeComponent  notebook={widget} panel={panel} />, this.node)
+    ReactDOM.render(<SelectTypeComponent {...props} panel={props.panel} />, this.node)
   }
 }
-const SelectTypeComponent = ({panel,notebook}:{panel:NotebookPanel,notebook:Notebook})=>{
+
+const SelectTypeComponent = ({panel,notebook,saveCodes}:SelectTypeProps)=>{
   const [value,setValue] = useState('Default');
   let tracker:INotebookSelectButtons = {}
   
@@ -87,7 +103,9 @@ const SelectTypeComponent = ({panel,notebook}:{panel:NotebookPanel,notebook:Note
     let selectValue = event.target.value
     setValue(selectValue)
     if(selectValue === 'Task'){
-      // let children = panel.toolbar.children()
+      // todo：task 模式下禁止 cell type 的切换
+      let children = panel.toolbar.children()
+      console.log(children)
       // 设置初始值
       notebook.model.metadata.set('cellRecords','{}');
       notebook.widgets.map((c: Cell) => {
@@ -114,7 +132,7 @@ const SelectTypeComponent = ({panel,notebook}:{panel:NotebookPanel,notebook:Note
       {
         value === 'Task' && 
         <div className={TOOLBAR_SAVE_BUTTON_CLASS}
-          // onClick={saveCode}
+          onClick={saveCodes}
         >
           {/* 在这一步保存生成文件 */}
           Save
