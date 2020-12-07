@@ -91,13 +91,18 @@ export interface SelectTypeProps {
 class SelectTypeWidget extends Widget{
   constructor(props:SelectTypeProps) {
     super()
-    ReactDOM.render(<SelectTypeComponent {...props} panel={props.panel} />, this.node)
+    ReactDOM.render(<SelectTypeComponent {...props} />, this.node)
   }
 }
 
 const SelectTypeComponent = ({panel,notebook,saveCodes}:SelectTypeProps)=>{
   const [value,setValue] = useState('Default');
-  let tracker:INotebookSelectButtons = {}
+  let tracker:INotebookSelectButtons = {};
+
+  useEffect(()=>{
+    // 设定初始的状态值
+    notebook.model.metadata.set('selectType','Default');
+  },[])
   
   const handleChange = (event:React.ChangeEvent<HTMLSelectElement>)=>{
     let selectValue = event.target.value
@@ -108,10 +113,19 @@ const SelectTypeComponent = ({panel,notebook,saveCodes}:SelectTypeProps)=>{
       console.log(children)
       // 设置初始值
       notebook.model.metadata.set('cellRecords','{}');
+      notebook.model.metadata.set('selectType','Task');
       notebook.widgets.map((c: Cell) => {
         AddSelectButton(c,notebook.model,tracker);
       });
+      // 处理新增加的 cell
+      notebook.activeCellChanged.connect((slot)=>{
+        console.log('触发activeCellChanged')
+        slot.widgets.map((c: Cell) => {
+          AddSelectButton(c,notebook.model,tracker);
+        });
+      })
     } else {
+      notebook.model.metadata.set('selectType','Default');
       notebook.widgets.map((c: Cell) => {
         RemoveSelectButton(c);
       });
@@ -129,15 +143,11 @@ const SelectTypeComponent = ({panel,notebook,saveCodes}:SelectTypeProps)=>{
         <option value="Default">Default</option>
         <option value="Task">Task</option>
       </HTMLSelect>
-      {
-        value === 'Task' && 
-        <div className={TOOLBAR_SAVE_BUTTON_CLASS}
-          onClick={saveCodes}
-        >
-          {/* 在这一步保存生成文件 */}
-          Save
-        </div>
-      }
+      <div className={TOOLBAR_SAVE_BUTTON_CLASS}
+        onClick={saveCodes}
+      >
+        Save
+      </div>
     </React.Fragment>
     
   );
@@ -159,6 +169,8 @@ export const AddSelectButton = (cell: Cell,model:INotebookModel,tracker:INoteboo
     // (cell.inputArea.layout as PanelLayout).insertWidget(0, selectButton); 添加至左边第一个
     // 将 widget 添加至末尾
     (cell.inputArea.layout as PanelLayout).addWidget(selectButton);
+  } else {
+    return;
   }
 };
 /**
@@ -196,11 +208,10 @@ class SelectButtonWidget extends Widget{
 const SelectButton = ({id,cell,model}:ISelectButtonProps)=>{
   const [isSelected, setIsSelected] = useState(false);
   const [record,setRecord] = useState(null);
-  const metadata = cell.model.metadata;
 
   useEffect(()=>{
     model.metadata.changed.connect(()=>{
-      const initiallySelected = metadata.get('isSelect') as boolean;
+      const initiallySelected = cell.model.metadata.get('isSelect') as boolean;
       const list = JSON.parse(model.metadata.get('cellRecords').toString());
       setRecord(list)
       const index = Object.keys(list).findIndex((item:string) =>item === id)
@@ -214,18 +225,18 @@ const SelectButton = ({id,cell,model}:ISelectButtonProps)=>{
     const record:any = JSON.parse(model.metadata.get('cellRecords').toString())
     if(!isSelected){
       record[cell.model.id] = cell.model.id;
-      metadata.set('isSelect', true);
+      cell.model.metadata.set('isSelect', true);
       
     } else {
       delete record[cell.model.id]
-      metadata.delete('isSelect');
+      cell.model.metadata.delete('isSelect');
     }
     let resultRecord = JSON.stringify(record)
     model.metadata.set('cellRecords',resultRecord)
     setRecord(record)
     setIsSelected(!isSelected);
   }
-  if(!metadata){
+  if(!cell){
     return;
   }
   if(!isSelected) return(
