@@ -119,29 +119,81 @@ const extension: JupyterFrontEndPlugin<void> = {
     app.shell.add(widget, 'left', { rank: 101 })
 
     let select = new SelectTypeExtension({
-      runCodes:async () => {
-        // todo：保存选中的代码，需要区分 default 和 task
+      runCodes: async() => {
+        let codes:string = '';
+        const notebookPanel = tracker.currentWidget;
+
+        if (notebookPanel === null) {
+          return
+        }
+
+        const nbWidget = notebookPanel.content;
+        const Type = notebookPanel.content.model.metadata.get('selectType');
+
+        if(Type === 'Default'){
+          const cells = nbWidget.model.cells
+          for (let index = 0; index < cells.length; index++) {
+            const cellModel = cells.get(index)
+            const isCodeCell = isCodeCellModel(cellModel)
+            if (!isCodeCell) {
+              continue
+            }
+
+            codes += cellModel.value.text + '\n\n'
+          }
+        } else if(Type === 'Task'){
+          // 组合多段代码
+          const recordList = JSON.parse(nbWidget.model.metadata.get('cellRecords').toString())
+          const cells = nbWidget.widgets;
+          for(let key in recordList){
+            cells.forEach(c=>{
+              const isCodeCell = isCodeCellModel(c.model)
+              if (isCodeCell && c.model.id === key) {
+                codes += c.model.value.text + '\n\n'
+              }
+            })
+          }
+          console.log(codes)
+        }
+        const { commands } = app;
+
+        let model = await commands.execute('docmanager:new-untitled', {
+          path: "/",
+          type: 'file',
+          ext: 'py'
+        })
+
+        model.content = codes;
+        model.format = 'text'
+        await app.serviceManager.contents.save(model.path, model);
+
+        const opener: DocumentManager.IWidgetOpener = {
+          open: widget => {
+            if (!widget.id) {
+              widget.id = `document-manager-${++Private.id}`;
+            }
+            widget.title.dataset = {
+              'type': 'document-title',
+              ...widget.title.dataset
+            };
+            if (!widget.isAttached) {
+              app.shell.add(widget, "main");
+            }
+            app.shell.activateById(widget.id);
+          }
+        };
+        const registry = app.docRegistry;
+        const docManager = new DocumentManager({ registry: registry, manager: app.serviceManager, opener: opener });
+
+        model = await renameDialog(docManager, model.path).catch(error => {
+          if (error !== 'File not renamed') {
+            void showErrorMessage('Rename Error', error);
+          }
+        })
       }
     });
     app.docRegistry.addWidgetExtension('Notebook', select);
 
-    tracker.currentChanged.connect(() => {
-
-      const notebookPanel = tracker.currentWidget;
-
-      if (notebookPanel === null) {
-        return
-      }
-    })
-
-    // 这里不是立刻获取到，需要等待
-    // const nbWidget = tracker.currentWidget;
-    // let selected_cells = nbWidget.notebook.widgets.filter(
-    //     cell => nbWidget.notebook.isSelected(cell)
-    // );
-    // let contents = selected_cells.map(
-    //     cell => cell.model.value.text
-    // );
     return
   }
 }
