@@ -131,25 +131,32 @@ const extension: JupyterFrontEndPlugin<void> = {
         const Type = notebookPanel.content.model.metadata.get('selectType');
 
         if(Type === 'Default'){
-          const cells = nbWidget.model.cells
-          for (let index = 0; index < cells.length; index++) {
-            const cellModel = cells.get(index)
-            const isCodeCell = isCodeCellModel(cellModel)
-            if (!isCodeCell) {
-              continue
-            }
+          // saveCode 不处理 default
+          // const cells = nbWidget.model.cells
+          // for (let index = 0; index < cells.length; index++) {
+          //   const cellModel = cells.get(index)
+          //   const isCodeCell = isCodeCellModel(cellModel)
+          //   if (!isCodeCell) {
+          //     continue
+          //   }
 
-            codes += cellModel.value.text + '\n\n'
-          }
+          //   codes += cellModel.value.text + '\n\n'
+          // }
         } else if(Type === 'Task'){
           // 组合多段代码
           const recordList = JSON.parse(nbWidget.model.metadata.get('cellRecords').toString())
           const cells = nbWidget.widgets;
+          if(Object.keys(recordList).length === 0){
+            console.log('Code snippet not selected')
+            return;
+          }
           for(let key in recordList){
             cells.forEach(c=>{
               const isCodeCell = isCodeCellModel(c.model)
               if (isCodeCell && c.model.id === key) {
+                codes += `#################### cell ${key} begin #################### \n\n`
                 codes += c.model.value.text + '\n\n'
+                codes += `#################### cell ${key} end #################### \n\n`
               }
             })
           }

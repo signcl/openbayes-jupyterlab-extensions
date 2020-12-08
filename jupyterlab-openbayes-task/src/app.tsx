@@ -24,10 +24,13 @@ import {
 
 import { PanelLayout } from '@lumino/widgets';
 
+
 const TOOLBAR_SELECTTYPE_DROPDOWN_CLASS = 'jp-Notebook-toolbarCellTypeDropdown select';
 const TOOLBAR_SAVE_BUTTON_CLASS = 'save-button';
-const TOOLBAR_SELECT_BUTTON_CLASS = 'select-button';
-const TOOLBAR_SELECT_NUMBER_BUTTON_CLASS = 'select-number-button';
+const CELL_SELECTTYPE_WRAPPER_CLASS = 'select-wrapper';
+const CELL_SELECT_BUTTON_CLASS = 'select-button';
+const CELL_SELECT_NUMBER_BUTTON_CLASS = 'select-number-button';
+const CELL_ID_BUTTON_CLASS = 'id-button';
 export interface IProps {
   runCodes?: () => void
 }
@@ -119,7 +122,6 @@ const SelectTypeComponent = ({panel,notebook,saveCodes}:SelectTypeProps)=>{
       });
       // 处理新增加的 cell
       notebook.activeCellChanged.connect((slot)=>{
-        console.log('触发activeCellChanged')
         slot.widgets.map((c: Cell) => {
           AddSelectButton(c,notebook.model,tracker);
         });
@@ -139,22 +141,28 @@ const SelectTypeComponent = ({panel,notebook,saveCodes}:SelectTypeProps)=>{
         onChange={handleChange}
         value={value}
         aria-label='Select'
+        title="Select Type"
       >
         <option value="Default">Default</option>
         <option value="Task">Task</option>
       </HTMLSelect>
-      <div className={TOOLBAR_SAVE_BUTTON_CLASS}
-        onClick={saveCodes}
-      >
-        Save
-      </div>
+      {/* 仅作用于 task 模式 */}
+      {
+        value === 'Task' &&
+        <div className={TOOLBAR_SAVE_BUTTON_CLASS}
+          onClick={saveCodes}
+        >
+          Export
+        </div>
+      }
     </React.Fragment>
-    
   );
 }
 /**
  * @description: 增加选择 button
- * @param {cell,model}
+ * @param cell cell 实例
+ * @param model notebook 的 model 实例
+ * @param tracker 记录是否已添加该 cell 的选择 button
  * @return {null}
  */
 export const AddSelectButton = (cell: Cell,model:INotebookModel,tracker:INotebookSelectButtons) => {
@@ -169,19 +177,22 @@ export const AddSelectButton = (cell: Cell,model:INotebookModel,tracker:INoteboo
     // (cell.inputArea.layout as PanelLayout).insertWidget(0, selectButton); 添加至左边第一个
     // 将 widget 添加至末尾
     (cell.inputArea.layout as PanelLayout).addWidget(selectButton);
+    // 将 widget 添加至 codeEditorWrapper,报错缺失 addWidget 方法
+    // const codeEditorWrapper = cell.editorWidget;
+    // (codeEditorWrapper.layout as PanelLayout).addWidget(selectButton);
   } else {
     return;
   }
 };
 /**
  * @description: 移除选择 button
- * @param {cell}
+ * @param cell cell 实例
  * @return {null}
  */
 export const RemoveSelectButton = (cell: Cell) => {
   if (cell.model.type === 'code') {
     (cell.inputArea.layout as PanelLayout).widgets.forEach(element => {
-      if(element.id === 'Select-Button'){
+      if(element.id && (element.id === 'Select-Button')){
         (cell.inputArea.layout as PanelLayout).removeWidget(element);
       }
     });
@@ -205,6 +216,13 @@ class SelectButtonWidget extends Widget{
     ReactDOM.render(<SelectButton {...props} />, this.node)
   }
 }
+/**
+ * @description: 用户选择代码片段的按钮
+ * @param id cell 的 id
+ * @param cell cell 实例
+ * @param model notebook 的 model
+ * @return {dom} 返回选择按钮的 dom
+ */
 const SelectButton = ({id,cell,model}:ISelectButtonProps)=>{
   const [isSelected, setIsSelected] = useState(false);
   const [record,setRecord] = useState(null);
@@ -240,20 +258,34 @@ const SelectButton = ({id,cell,model}:ISelectButtonProps)=>{
     return;
   }
   if(!isSelected) return(
-    <div 
-      title="Select"
-      className={TOOLBAR_SELECT_BUTTON_CLASS} 
-      onClick={handelClick}
-    >
-      <svg focusable="false" viewBox="0 0 24 24" fill="none" aria-hidden="true" xmlns="http://www.w3.org/2000/svg"><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"></path></svg>
+    <div className={CELL_SELECTTYPE_WRAPPER_CLASS}>
+      <div 
+        title="Select"
+        className={CELL_SELECT_BUTTON_CLASS} 
+        onClick={handelClick}
+      >
+        <svg focusable="false" viewBox="0 0 24 24" fill="none" aria-hidden="true" xmlns="http://www.w3.org/2000/svg"><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"></path></svg>
+      </div>
+      <div 
+        className={CELL_ID_BUTTON_CLASS}
+        title={id}>
+        {id.slice(0,8)}
+      </div>
     </div>
+    
     )
   return(
-    <div className={TOOLBAR_SELECT_NUMBER_BUTTON_CLASS} onClick={handelClick}>
-      {
-      Object.keys(record).findIndex((item:string) =>item === id)+1
-      }
+    <div className={CELL_SELECTTYPE_WRAPPER_CLASS}>
+      <div className={CELL_SELECT_NUMBER_BUTTON_CLASS} onClick={handelClick}>
+        {
+        Object.keys(record).findIndex((item:string) =>item === id)+1
+        }
+      </div>
+      <div 
+        className={CELL_ID_BUTTON_CLASS}
+        title={id}>
+        {id.slice(0,8)}
+      </div>
     </div>
     )
 }
-

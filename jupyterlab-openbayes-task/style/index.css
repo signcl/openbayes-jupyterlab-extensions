@@ -112,7 +112,7 @@
   min-height: 1.2em;
   padding: 0px 5px;
   border-radius: 2px;
-  font-size: 12px;
+  font-size: var(--jp-ui-font-size1);
   line-height: 24px;
 }
 
@@ -122,7 +122,7 @@
 }
 
 [data-jp-theme-light="true"] .save-button:hover {
-  background-color: #eeeeee;
+  background-color: var(--gray);
 }
 
 [data-jp-theme-light="false"] .save-button:hover {
@@ -131,10 +131,10 @@
 }
 
 .select-button {
-  width: 40px;
+  width: 24px;
   height: 24px;
   margin: 0 .5em;
-  border-radius: 4px;
+  border-radius: 12px;
   border: .1em solid var(--link-color);
   box-sizing: border-box;
   color: var(--link-color);
@@ -163,10 +163,10 @@
 }
 
 .select-number-button {
-  width: 40px;
+  width: 24px;
   height: 24px;
   margin: 0 .5em;
-  border-radius: 4px;
+  border-radius: 12px;
   background-color: var(--link-color-40);
   color: var(--link-color);
   font-weight: 600;
@@ -179,4 +179,19 @@
 .select-number-button:hover {
   background-color: var(--link-color-20);
   color: var(--link-color-60);
+}
+
+.id-button {
+  width: 5em;
+  height: 1.5em;
+  border-radius: 5px;
+  text-align: center;
+  background-color: var(--gray);
+  color: var(--jp-ui-font-color0);
+}
+
+.select-wrapper {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
 }
