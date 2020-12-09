@@ -107,16 +107,7 @@
   position: relative;
 }
 
-.save-button {
-  font-family: var(--jp-ui-font-family);
-  min-height: 1.2em;
-  padding: 0px 5px;
-  border-radius: 2px;
-  font-size: var(--jp-ui-font-size1);
-  line-height: 24px;
-}
-
-[data-jp-theme-light="true"] .save-button {
+/* [data-jp-theme-light="true"] .save-button {
   background-color: var(--white);
   color: var(--jp-ui-font-color0);
 }
@@ -128,7 +119,7 @@
 [data-jp-theme-light="false"] .save-button:hover {
   background-color: var(--gray-dark);
   color: var(--white);
-}
+} */
 
 .select-button {
   width: 24px;
@@ -186,11 +177,14 @@
   height: 1.5em;
   border-radius: 5px;
   text-align: center;
-  background-color: var(--gray);
-  color: var(--jp-ui-font-color0);
+  background-color: var(--link-color-20);
+  color: var(--link-color-60);
 }
 
 .select-wrapper {
+  position: absolute;
+  right: 0px;
+  z-index: 10;
   display: flex;
   flex-direction: row;
   justify-content: space-between;

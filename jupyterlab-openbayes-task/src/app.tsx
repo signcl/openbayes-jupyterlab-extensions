@@ -26,7 +26,9 @@ import { PanelLayout } from '@lumino/widgets';
 
 
 const TOOLBAR_SELECTTYPE_DROPDOWN_CLASS = 'jp-Notebook-toolbarCellTypeDropdown select';
-const TOOLBAR_SAVE_BUTTON_CLASS = 'save-button';
+const TOOLBAR_SAVE_BUTTON_WRAPPER_CLASS = 'jp-ToolbarButton jp-Toolbar-item';
+const TOOLBAR_SAVE_BUTTON_CLASS = 'bp3-button bp3-minimal jp-ToolbarButtonComponent minimal jp-Button save-button ';
+// save-button
 const CELL_SELECTTYPE_WRAPPER_CLASS = 'select-wrapper';
 const CELL_SELECT_BUTTON_CLASS = 'select-button';
 const CELL_SELECT_NUMBER_BUTTON_CLASS = 'select-number-button';
@@ -149,10 +151,14 @@ const SelectTypeComponent = ({panel,notebook,saveCodes}:SelectTypeProps)=>{
       {/* 仅作用于 task 模式 */}
       {
         value === 'Task' &&
-        <div className={TOOLBAR_SAVE_BUTTON_CLASS}
+        <div className={TOOLBAR_SAVE_BUTTON_WRAPPER_CLASS}
           onClick={saveCodes}
         >
-          Export
+          <button className={TOOLBAR_SAVE_BUTTON_CLASS}>
+            <span className={'bp3-button-text'}>
+              <span className={'jp-ToolbarButtonComponent-label'}>Export</span>
+            </span>
+          </button>
         </div>
       }
     </React.Fragment>
@@ -174,7 +180,9 @@ export const AddSelectButton = (cell: Cell,model:INotebookModel,tracker:INoteboo
     });
     tracker[cell.model.id] = selectButton;
     selectButton.id = "Select-Button";
-    // (cell.inputArea.layout as PanelLayout).insertWidget(0, selectButton); 添加至左边第一个
+    selectButton.addClass(CELL_SELECTTYPE_WRAPPER_CLASS);
+    // (cell.inputArea.layout as PanelLayout).insertWidget(0, selectButton); 
+    // 添加至左边第一个
     // 将 widget 添加至末尾
     (cell.inputArea.layout as PanelLayout).addWidget(selectButton);
     // 将 widget 添加至 codeEditorWrapper,报错缺失 addWidget 方法
@@ -258,7 +266,7 @@ const SelectButton = ({id,cell,model}:ISelectButtonProps)=>{
     return;
   }
   if(!isSelected) return(
-    <div className={CELL_SELECTTYPE_WRAPPER_CLASS}>
+    <React.Fragment>
       <div 
         title="Select"
         className={CELL_SELECT_BUTTON_CLASS} 
@@ -271,11 +279,10 @@ const SelectButton = ({id,cell,model}:ISelectButtonProps)=>{
         title={id}>
         {id.slice(0,8)}
       </div>
-    </div>
-    
+    </React.Fragment>
     )
   return(
-    <div className={CELL_SELECTTYPE_WRAPPER_CLASS}>
+    <React.Fragment>
       <div className={CELL_SELECT_NUMBER_BUTTON_CLASS} onClick={handelClick}>
         {
         Object.keys(record).findIndex((item:string) =>item === id)+1
@@ -286,6 +293,6 @@ const SelectButton = ({id,cell,model}:ISelectButtonProps)=>{
         title={id}>
         {id.slice(0,8)}
       </div>
-    </div>
+    </React.Fragment>
     )
 }
