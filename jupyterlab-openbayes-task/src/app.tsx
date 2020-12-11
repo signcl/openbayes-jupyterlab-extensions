@@ -11,18 +11,23 @@ import {
 } from '@jupyterlab/docregistry';
 
 import {
-  Notebook,NotebookPanel, INotebookModel
+  Notebook,NotebookPanel, INotebookModel,NotebookActions
 } from '@jupyterlab/notebook';
 
 import {
-  HTMLSelect
+  HTMLSelect,
+  runIcon
 } from '@jupyterlab/ui-components';
 
 import {
-  Cell
+  Cell,CodeCell
 } from '@jupyterlab/cells';
 
 import { PanelLayout } from '@lumino/widgets';
+
+import { 
+  ToolbarButtonComponent,ReactWidget
+} from '@jupyterlab/apputils';
 
 
 const TOOLBAR_SELECTTYPE_DROPDOWN_CLASS = 'jp-Notebook-toolbarCellTypeDropdown select';
@@ -181,13 +186,8 @@ export const AddSelectButton = (cell: Cell,model:INotebookModel,tracker:INoteboo
     tracker[cell.model.id] = selectButton;
     selectButton.id = "Select-Button";
     selectButton.addClass(CELL_SELECTTYPE_WRAPPER_CLASS);
-    // (cell.inputArea.layout as PanelLayout).insertWidget(0, selectButton); 
-    // 添加至左边第一个
     // 将 widget 添加至末尾
     (cell.inputArea.layout as PanelLayout).addWidget(selectButton);
-    // 将 widget 添加至 codeEditorWrapper,报错缺失 addWidget 方法
-    // const codeEditorWrapper = cell.editorWidget;
-    // (codeEditorWrapper.layout as PanelLayout).addWidget(selectButton);
   } else {
     return;
   }
@@ -293,6 +293,83 @@ const SelectButton = ({id,cell,model}:ISelectButtonProps)=>{
         title={id}>
         {id.slice(0,8)}
       </div>
+    </React.Fragment>
+    )
+}
+
+/**
+ * @description: 覆盖写入 inputArea 的 prompt
+ * @param panel 当前的 notebook 的 widget
+ * @return dom 返回新的 dom 节点
+ */
+export function createRunButton(
+  panel: NotebookPanel,
+  cell: CodeCell
+): Widget {
+  function onClick() {
+    void NotebookActions.run(panel.content, panel.sessionContext);
+  }
+  
+  return ReactWidget.create(
+    <RunButtonComponent panel={panel} cell={cell} onClickEvent={onClick}></RunButtonComponent>
+    );
+}
+interface RunButtonComponentProps {
+  panel: NotebookPanel;
+  cell: CodeCell;
+  onClickEvent:()=>void;
+}
+const RunButtonComponent = ({panel,cell,onClickEvent}:RunButtonComponentProps)=>{
+  const [showRun,setShowRun] = useState(false);
+  const [runTime,setRunTime] = useState(0);
+  let delayTimer:any = null;
+  const clickRunButton = ()=>{
+    setShowRun(false);
+    onClickEvent();
+    console.log('点击了按钮')
+    // 获取当前 cell 的运行索引, 只有 CodeCell 具有 executionCount 属性
+    if(cell.model){
+      const count = cell.model.executionCount
+      setRunTime(count);
+    } else {
+      console.log(cell)
+    }
+  }
+  const changeRunButton = (value:boolean)=>{
+    if(delayTimer){
+      clearTimeout(delayTimer);
+    }
+    delayTimer = setTimeout(()=>{
+      setShowRun(value);
+    },300);
+    
+  };
+  return(
+  <React.Fragment>
+          {
+            showRun ?
+            <div onMouseLeave={()=>changeRunButton(false)}>
+              <ToolbarButtonComponent
+                icon={runIcon}
+                onClick={clickRunButton}
+                tooltip={'Run the selected cells'}
+                enabled={
+                  !!(
+                    panel &&
+                    panel.context &&
+                    panel.context.contentsModel &&
+                    panel.context.contentsModel.writable
+                  )
+                }
+              />
+            </div>
+            :
+            <div 
+              className={'lm-Widget p-Widget jp-InputPrompt jp-InputArea-prompt'}
+              onMouseEnter={()=>changeRunButton(true)}
+            >[{runTime > 0 ? runTime: ' '}]:
+            </div>
+          }
     </React.Fragment>
     )
 }
