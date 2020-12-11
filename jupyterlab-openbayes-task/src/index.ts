@@ -8,7 +8,7 @@ import { showErrorMessage } from '@jupyterlab/apputils'
 
 import { INotebookTracker } from '@jupyterlab/notebook'
 
-import { isCodeCellModel } from '@jupyterlab/cells'
+import { isCodeCellModel,CodeCell } from '@jupyterlab/cells'
 
 import {
   IFileBrowserFactory
@@ -18,7 +18,7 @@ import { DocumentManager, renameDialog } from '@jupyterlab/docmanager'
 
 import { PanelLayout } from '@lumino/widgets';
 
-import { LeftPanelWidget,SelectTypeExtension } from './app'
+import { LeftPanelWidget,SelectTypeExtension,createRunButton } from './app'
 
 import {run, uploadRequest, uploadCode, getJobDetail} from './api'
 import { getEnvs } from "./env";
@@ -222,14 +222,27 @@ const extension: JupyterFrontEndPlugin<void> = {
       }
 
       // 处理 cell 中的 prompt ，todo：覆盖原有的样式，改为鼠标hover出现 run 的按钮
-      // let notebook = tracker.currentWidget.content;
-      // notebook.widgets.map((cell,index)=>{
-      //   console.log(index,cell);
-      //   console.log('cell')
-      //   return cell.inputArea.setHidden(true)
-      //   // cell.inputArea.setHidden(true);
-        
-      // })
+      let notebook = tracker.currentWidget.content;
+      console.log(notebook.widgets);
+      // bug：这里有个问题，初始化只能获取到第一个prompt，当点击其他的cell，才会获取到全部的cell
+      notebook.activeCellChanged.connect((slot)=>{
+        console.log('forEach');
+        slot.widgets.forEach((cell)=>{
+          if(isCodeCellModel(cell.model)){
+            // 隐藏jupyterlab自带的 prompt
+            if((cell.inputArea.layout as PanelLayout).widgets[0].id === ""){
+              (cell.inputArea.layout as PanelLayout).widgets[0].setHidden(true);
+            }
+            // 增加 openbayes 开发的 prompt
+            if((cell.inputArea.layout as PanelLayout).widgets[0].id !== "run button"){
+              const newPrompt = createRunButton(tracker.currentWidget,(cell as CodeCell));
+              newPrompt.id = "run button";
+              (cell.inputArea.layout as PanelLayout).insertWidget(0,newPrompt);
+            }
+          }
+        })
+      })
+      
     });
     return
   }
