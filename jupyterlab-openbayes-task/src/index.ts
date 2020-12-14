@@ -202,24 +202,13 @@ const extension: JupyterFrontEndPlugin<void> = {
     });
     app.docRegistry.addWidgetExtension('Notebook', select);
     
-    // 1.隐藏toolbar 中的 run 按钮，移位至每一个 cell 中
+    
     tracker.currentChanged.connect(()=>{
       let nbWidget = tracker.currentWidget
       if(!nbWidget){
         return;
       }
-      // 遍历 toolbar 的 names 获取目标，移除 run 的按钮
-      let index = 0;
-      let toolNames = nbWidget.toolbar.names();
-      let nextName = toolNames.next();
-      while (nextName != undefined && nextName != 'spacer') {
-        index += 1;
-        nextName = toolNames.next();
-        if(nextName === 'run'){
-          // console.log('隐藏run按钮');
-          (nbWidget.toolbar.layout as PanelLayout).widgets[index].setHidden(true);
-        }
-      }
+      
 
       // 处理 cell 中的 prompt ，todo：覆盖原有的样式，改为鼠标hover出现 run 的按钮
       let notebook = tracker.currentWidget.content;
