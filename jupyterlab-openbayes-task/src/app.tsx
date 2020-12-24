@@ -20,7 +20,7 @@ import {
 } from '@jupyterlab/ui-components';
 
 import {
-  Cell,CodeCell
+  Cell,CodeCell,isCodeCellModel
 } from '@jupyterlab/cells';
 
 import { PanelLayout } from '@lumino/widgets';
@@ -124,19 +124,70 @@ const SelectTypeComponent = ({panel,notebook,saveCodes}:SelectTypeProps)=>{
       // 设置初始值
       notebook.model.metadata.set('cellRecords','{}');
       notebook.model.metadata.set('selectType','Task');
-      notebook.widgets.map((c: Cell) => {
-        AddSelectButton(c,notebook.model,tracker);
+      notebook.widgets.forEach((cell: Cell) => {
+        AddSelectButton(cell,notebook.model,tracker);
+        if(isCodeCellModel(cell.model)){
+          // 隐藏jupyterlab自带的 prompt
+          if((cell.inputArea.layout as PanelLayout).widgets[0].id === ""){
+            (cell.inputArea.layout as PanelLayout).widgets[0].setHidden(true);
+          }
+          // 增加 openbayes 开发的 prompt
+          if((cell.inputArea.layout as PanelLayout).widgets[0].id !== "run button"){
+            const newPrompt = createRunButton(panel,(cell as CodeCell));
+            newPrompt.id = "run button";
+            newPrompt.addClass('jp-InputPrompt');
+            newPrompt.addClass('jp-InputArea-prompt');
+            (cell.inputArea.layout as PanelLayout).insertWidget(0,newPrompt);
+          }
+        }
       });
+
       // 处理新增加的 cell
       notebook.activeCellChanged.connect((slot)=>{
-        slot.widgets.map((c: Cell) => {
-          AddSelectButton(c,notebook.model,tracker);
+        const Type = notebook.model.metadata.get('selectType');
+        slot.widgets.forEach((cell: Cell) => {
+          if(isCodeCellModel(cell.model)){
+            if(Type=== 'Task'){
+              AddSelectButton(cell,notebook.model,tracker);
+              // 隐藏jupyterlab自带的 prompt
+              if((cell.inputArea.layout as PanelLayout).widgets[0].id === ""){
+                (cell.inputArea.layout as PanelLayout).widgets[0].setHidden(true);
+              }
+              // 增加 openbayes 开发的 prompt
+              if((cell.inputArea.layout as PanelLayout).widgets[0].id !== "run button"){
+                const newPrompt = createRunButton(panel,(cell as CodeCell));
+                newPrompt.id = "run button";
+                newPrompt.addClass('jp-InputPrompt');
+                newPrompt.addClass('jp-InputArea-prompt');
+                (cell.inputArea.layout as PanelLayout).insertWidget(0,newPrompt);
+              }
+            } else {
+              // 隐藏 openbayes 开发的 prompt
+              if((cell.inputArea.layout as PanelLayout).widgets[0].id === "run button"){
+                (cell.inputArea.layout as PanelLayout).removeWidgetAt(0);
+              }
+              // 显示jupyterlab自带的 prompt
+              if((cell.inputArea.layout as PanelLayout).widgets[0].id === ""){
+                (cell.inputArea.layout as PanelLayout).widgets[0].setHidden(false);
+              }
+            }
+          }
         });
       })
     } else {
       notebook.model.metadata.set('selectType','Default');
-      notebook.widgets.map((c: Cell) => {
-        RemoveSelectButton(c);
+      notebook.widgets.map((cell: Cell) => {
+        RemoveSelectButton(cell);
+        if(isCodeCellModel(cell.model)){
+          // 隐藏 openbayes 开发的 prompt
+          if((cell.inputArea.layout as PanelLayout).widgets[0].id === "run button"){
+            (cell.inputArea.layout as PanelLayout).removeWidgetAt(0);
+          }
+          // 显示jupyterlab自带的 prompt
+          if((cell.inputArea.layout as PanelLayout).widgets[0].id === ""){
+            (cell.inputArea.layout as PanelLayout).widgets[0].setHidden(false);
+          }
+        }
       });
       notebook.model.metadata.delete('cellTracker')
     }
@@ -306,34 +357,46 @@ export function createRunButton(
   panel: NotebookPanel,
   cell: CodeCell
 ): Widget {
+  let count = 0;
   function onClick() {
-    void NotebookActions.run(panel.content, panel.sessionContext);
+    void NotebookActions.run(panel.content, panel.sessionContext).then(()=>{
+      count = cell.model.executionCount;
+    });
   }
   
   return ReactWidget.create(
-    <RunButtonComponent panel={panel} cell={cell} onClickEvent={onClick}></RunButtonComponent>
+    <RunButtonComponent panel={panel} cell={cell} onClickEvent={onClick} runTime={count}></RunButtonComponent>
     );
 }
 interface RunButtonComponentProps {
   panel: NotebookPanel;
   cell: CodeCell;
+  runTime:number;
   onClickEvent:()=>void;
 }
-const RunButtonComponent = ({panel,cell,onClickEvent}:RunButtonComponentProps)=>{
+const RunButtonComponent = ({panel,cell,onClickEvent,runTime}:RunButtonComponentProps)=>{
   const [showRun,setShowRun] = useState(false);
-  const [runTime,setRunTime] = useState(0);
+  // const [runTime,setRunTime] = useState(0);
   let delayTimer:any = null;
+
+  useEffect(()=>{
+    if(cell.model){
+      const count = cell.model.executionCount;
+      console.log(count);
+      runTime = count;
+    }
+  },[cell])
+
   const clickRunButton = ()=>{
     setShowRun(false);
     onClickEvent();
     console.log('点击了按钮')
     // 获取当前 cell 的运行索引, 只有 CodeCell 具有 executionCount 属性
-    if(cell.model){
-      const count = cell.model.executionCount
-      setRunTime(count);
-    } else {
-      console.log(cell)
-    }
+    // if(cell.model){
+    //   const count = cell.model.executionCount
+    //   console.log(count);
+    //   setRunTime(count);
+    // }
   }
   const changeRunButton = (value:boolean)=>{
     if(delayTimer){
@@ -345,31 +408,34 @@ const RunButtonComponent = ({panel,cell,onClickEvent}:RunButtonComponentProps)=>
     
   };
   return(
-  <React.Fragment>
-          {
-            showRun ?
-            <div onMouseLeave={()=>changeRunButton(false)}>
-              <ToolbarButtonComponent
-                icon={runIcon}
-                onClick={clickRunButton}
-                tooltip={'Run the selected cells'}
-                enabled={
-                  !!(
-                    panel &&
-                    panel.context &&
-                    panel.context.contentsModel &&
-                    panel.context.contentsModel.writable
-                  )
-                }
-              />
-            </div>
-            :
-            <div 
-              className={'lm-Widget p-Widget jp-InputPrompt jp-InputArea-prompt'}
-              onMouseEnter={()=>changeRunButton(true)}
-            >[{runTime > 0 ? runTime: ' '}]:
-            </div>
+  <div
+    style={{ display: 'flex', flexDirection: 'row', justifyContent: 'flex-end'}}
+    onMouseEnter={()=>changeRunButton(true)}
+    onMouseLeave={()=>changeRunButton(false)}
+  >
+    {
+      showRun &&
+      <div >
+        <ToolbarButtonComponent
+          icon={runIcon}
+          onClick={clickRunButton}
+          tooltip={'Run the selected cells'}
+          enabled={
+            !!(
+              panel &&
+              panel.context &&
+              panel.context.contentsModel &&
+              panel.context.contentsModel.writable
+            )
           }
-    </React.Fragment>
+        />
+      </div>
+      // :
+      // <div 
+      //   className={'lm-Widget p-Widget'}
+      // >[{runTime > 0 ? runTime: ' '}]:
+      // </div>
+    }
+    </div>
     )
 }
