@@ -14,7 +14,7 @@ import {
   IFileBrowserFactory
 } from '@jupyterlab/filebrowser';
 
-import { DocumentManager, renameDialog } from '@jupyterlab/docmanager'
+import { DocumentManager,IDocumentManager, renameDialog } from '@jupyterlab/docmanager'
 
 // import { PanelLayout } from '@lumino/widgets';
 
@@ -24,7 +24,9 @@ import {run, uploadRequest, uploadCode, getJobDetail} from './api'
 import { getEnvs } from "./env";
 
 export const NAMESPACE = 'openbayes-task'
-
+namespace CommandIDs {
+  export const createOutputFileView = 'notebook:create-output-file-view';
+}
 /**
  * Initialization data for the jupyterlab-openbayes-task extension.
  */
@@ -36,193 +38,245 @@ const extension: JupyterFrontEndPlugin<void> = {
       INotebookTracker,
       IFileBrowserFactory
   ],
-  activate: (
-    app: JupyterFrontEnd,
-    restorer: ILayoutRestorer,
-    tracker: INotebookTracker,
-    factory: IFileBrowserFactory
-  ) => {
-    console.log('JupyterLab extension jupyterlab-openbayes-task is activated!')
+  activate: activateExtension
+}
 
-    const widget = new LeftPanelWidget({
-      runCodes: async () => {
-        let codes: string = ''
+function activateExtension(app: JupyterFrontEnd,
+  restorer: ILayoutRestorer,
+  tracker: INotebookTracker,
+  factory: IFileBrowserFactory,
+  docManager: IDocumentManager,
+  ){
+  console.log('JupyterLab extension jupyterlab-openbayes-task is activated!')
 
-        if (tracker.currentWidget) {
-          let nbWidget = tracker.currentWidget.content
+  const widget = new LeftPanelWidget({
+    runCodes: async () => {
+      let codes: string = ''
 
-          const cells = nbWidget.model.cells
-          for (let index = 0; index < cells.length; index++) {
-            const cellModel = cells.get(index)
-            const isCodeCell = isCodeCellModel(cellModel)
-            if (!isCodeCell) {
-              continue
-            }
+      if (tracker.currentWidget) {
+        let nbWidget = tracker.currentWidget.content
 
-            codes += cellModel.value.text + '\n\n'
+        const cells = nbWidget.model.cells
+        for (let index = 0; index < cells.length; index++) {
+          const cellModel = cells.get(index)
+          const isCodeCell = isCodeCellModel(cellModel)
+          if (!isCodeCell) {
+            continue
           }
+
+          codes += cellModel.value.text + '\n\n'
         }
-
-        // console.log(codes)
-
-        const { commands } = app;
-
-        let model = await commands.execute('docmanager:new-untitled', {
-          path: "/",
-          type: 'file',
-          ext: 'py'
-        })
-
-        model.content = codes;
-        model.format = 'text'
-        await app.serviceManager.contents.save(model.path, model);
-
-        const opener: DocumentManager.IWidgetOpener = {
-          open: widget => {
-            if (!widget.id) {
-              widget.id = `document-manager-${++Private.id}`;
-            }
-            widget.title.dataset = {
-              'type': 'document-title',
-              ...widget.title.dataset
-            };
-            if (!widget.isAttached) {
-              app.shell.add(widget, "main");
-            }
-            app.shell.activateById(widget.id);
-          }
-        };
-        const registry = app.docRegistry;
-        const docManager = new DocumentManager({ registry: registry, manager: app.serviceManager, opener: opener });
-
-        model = await renameDialog(docManager, model.path).catch(error => {
-          if (error !== 'File not renamed') {
-            void showErrorMessage('Rename Error', error);
-          }
-        })
-
-        if (model !== undefined) {
-          console.log("path: " + model.path + ", name: " + model.name)
-          const path = await getCodeURL(factory,model.path)
-          await runCode(path)
-        }
-
       }
-    })
 
-    widget.id = 'openbayes-task-widget'
-    widget.title.iconClass = 'task-icon'
-    widget.title.caption = 'OpenBayes Task'
-    widget.title.closable = true
-    widget.addClass('task-widget')
+      // console.log(codes)
 
-    restorer.add(widget, NAMESPACE)
-    app.shell.add(widget, 'left', { rank: 101 })
+      const { commands } = app;
 
-    let select = new SelectTypeExtension({
-      runCodes: async() => {
-        let codes:string = '';
-        const notebookPanel = tracker.currentWidget;
+      let model = await commands.execute('docmanager:new-untitled', {
+        path: "/",
+        type: 'file',
+        ext: 'py'
+      })
 
-        if (notebookPanel === null) {
-          return
+      model.content = codes;
+      model.format = 'text'
+      await app.serviceManager.contents.save(model.path, model);
+
+      const opener: DocumentManager.IWidgetOpener = {
+        open: widget => {
+          if (!widget.id) {
+            widget.id = `document-manager-${++Private.id}`;
+          }
+          widget.title.dataset = {
+            'type': 'document-title',
+            ...widget.title.dataset
+          };
+          if (!widget.isAttached) {
+            app.shell.add(widget, "main");
+          }
+          app.shell.activateById(widget.id);
         }
+      };
+      const registry = app.docRegistry;
+      const docManager = new DocumentManager({ registry: registry, manager: app.serviceManager, opener: opener });
 
-        const nbWidget = notebookPanel.content;
-        const Type = notebookPanel.content.model.metadata.get('selectType');
-
-        if(Type === 'Default'){
-          // saveCode 不处理 default
-          // const cells = nbWidget.model.cells
-          // for (let index = 0; index < cells.length; index++) {
-          //   const cellModel = cells.get(index)
-          //   const isCodeCell = isCodeCellModel(cellModel)
-          //   if (!isCodeCell) {
-          //     continue
-          //   }
-
-          //   codes += cellModel.value.text + '\n\n'
-          // }
-        } else if(Type === 'Task'){
-          // 组合多段代码
-          const recordList = JSON.parse(nbWidget.model.metadata.get('cellRecords').toString())
-          const cells = nbWidget.widgets;
-          if(Object.keys(recordList).length === 0){
-            console.log('Code snippet not selected')
-            return;
-          }
-          for(let key in recordList){
-            cells.forEach(c=>{
-              const isCodeCell = isCodeCellModel(c.model)
-              if (isCodeCell && c.model.id === key) {
-                codes += `#################### cell ${key} begin #################### \n\n`
-                codes += c.model.value.text + '\n\n'
-                codes += `#################### cell ${key} end #################### \n\n`
-              }
-            })
-          }
-          console.log(codes)
+      model = await renameDialog(docManager, model.path).catch(error => {
+        if (error !== 'File not renamed') {
+          void showErrorMessage('Rename Error', error);
         }
-        const { commands } = app;
+      })
 
-        let model = await commands.execute('docmanager:new-untitled', {
-          path: "/",
-          type: 'file',
-          ext: 'py'
-        })
-
-        model.content = codes;
-        model.format = 'text'
-        await app.serviceManager.contents.save(model.path, model);
-
-        const opener: DocumentManager.IWidgetOpener = {
-          open: widget => {
-            if (!widget.id) {
-              widget.id = `document-manager-${++Private.id}`;
-            }
-            widget.title.dataset = {
-              'type': 'document-title',
-              ...widget.title.dataset
-            };
-            if (!widget.isAttached) {
-              app.shell.add(widget, "main");
-            }
-            app.shell.activateById(widget.id);
-          }
-        };
-        const registry = app.docRegistry;
-        const docManager = new DocumentManager({ registry: registry, manager: app.serviceManager, opener: opener });
-
-        model = await renameDialog(docManager, model.path).catch(error => {
-          if (error !== 'File not renamed') {
-            void showErrorMessage('Rename Error', error);
-          }
-        })
+      if (model !== undefined) {
+        console.log("path: " + model.path + ", name: " + model.name)
+        const path = await getCodeURL(factory,model.path)
+        await runCode(path)
       }
-    });
-    app.docRegistry.addWidgetExtension('Notebook', select);
-    
-    
-    tracker.currentChanged.connect(()=>{
-      let nbWidget = tracker.currentWidget
-      if(!nbWidget){
+
+    }
+  })
+
+  restorer.add(widget, NAMESPACE)
+  app.shell.add(widget, 'left', { rank: 101 })
+
+  let select = new SelectTypeExtension({
+    runCodes: async() => {
+      let codes:string = '';
+      const notebookPanel = tracker.currentWidget;
+
+      if (notebookPanel === null) {
+        return
+      }
+
+      const nbWidget = notebookPanel.content;
+      const Type = notebookPanel.content.model.metadata.get('selectType');
+
+      if(Type === 'Default'){
+        // saveCode 不处理 default
+        // const cells = nbWidget.model.cells
+        // for (let index = 0; index < cells.length; index++) {
+        //   const cellModel = cells.get(index)
+        //   const isCodeCell = isCodeCellModel(cellModel)
+        //   if (!isCodeCell) {
+        //     continue
+        //   }
+
+        //   codes += cellModel.value.text + '\n\n'
+        // }
+      } else if(Type === 'Task'){
+        // 组合多段代码
+        const recordList = JSON.parse(nbWidget.model.metadata.get('cellRecords').toString())
+        const cells = nbWidget.widgets;
+        if(Object.keys(recordList).length === 0){
+          console.log('Code snippet not selected')
+          return;
+        }
+        for(let key in recordList){
+          cells.forEach(c=>{
+            const isCodeCell = isCodeCellModel(c.model)
+            if (isCodeCell && c.model.id === key) {
+              codes += `#################### cell ${key} begin #################### \n\n`
+              codes += c.model.value.text + '\n\n'
+              codes += `#################### cell ${key} end #################### \n\n`
+            }
+          })
+        }
+        console.log(codes)
+      }
+      const { commands } = app;
+
+      let model = await commands.execute('docmanager:new-untitled', {
+        path: "/",
+        type: 'file',
+        ext: 'py'
+      })
+
+      model.content = codes;
+      model.format = 'text'
+      await app.serviceManager.contents.save(model.path, model);
+
+      const opener: DocumentManager.IWidgetOpener = {
+        open: widget => {
+          if (!widget.id) {
+            widget.id = `document-manager-${++Private.id}`;
+          }
+          widget.title.dataset = {
+            'type': 'document-title',
+            ...widget.title.dataset
+          };
+          if (!widget.isAttached) {
+            app.shell.add(widget, "main");
+          }
+          app.shell.activateById(widget.id);
+        }
+      };
+      const registry = app.docRegistry;
+      const docManager = new DocumentManager({ registry: registry, manager: app.serviceManager, opener: opener });
+
+      model = await renameDialog(docManager, model.path).catch(error => {
+        if (error !== 'File not renamed') {
+          void showErrorMessage('Rename Error', error);
+        }
+      })
+    }
+  });
+  app.docRegistry.addWidgetExtension('Notebook', select);
+  
+  app.contextMenu.addItem({
+    command: CommandIDs.createOutputFileView,
+    selector: '.jp-Notebook .jp-CodeCell',
+    rank: 10
+  });
+  const { commands } = app;
+
+  commands.addCommand(CommandIDs.createOutputFileView, {
+    label: 'Create New File View for Output',
+    execute: async args => {
+      console.log(args)
+      let codes:string = '';
+      const notebookPanel = tracker.currentWidget;
+
+      if (notebookPanel === null) {
+        return
+      }
+      const nbWidget = notebookPanel.content;
+      const recordList = JSON.parse(nbWidget.model.metadata.get('cellRecords').toString())
+      const cells = nbWidget.widgets;
+
+      if(Object.keys(recordList).length === 0){
+        console.log('Code snippet not selected')
         return;
       }
-      
-
-      // 处理 cell 中的 prompt ，todo：覆盖原有的样式，改为鼠标hover出现 run 的按钮
-      let notebook = tracker.currentWidget.content;
-      console.log(notebook.widgets);
-      const Type = notebook.model.metadata.get('selectType');
-      if(Type === 'Task'){
-        // bug：这里有个问题，初始化只能获取到第一个prompt，当点击其他的cell，才会获取到全部的cell
-        notebook.activeCellChanged.connect((slot)=>{
-          console.log('forEach');
+      for(let key in recordList){
+        cells.forEach(c=>{
+          const isCodeCell = isCodeCellModel(c.model)
+          if (isCodeCell && c.model.id === key) {
+            codes += `#################### cell ${key} begin #################### \n\n`
+            codes += c.model.value.text + '\n\n'
+            codes += `#################### cell ${key} end #################### \n\n`
+          }
         })
       }
-    });
-    return
-  }
+      // 获取到了 codes 片段，需要输出到底部的 panel
+      console.log(codes)
+      // let cell: CodeCell | undefined;
+      // let current: NotebookPanel | undefined | null;
+      // If we are given a notebook path and cell index, then
+      // use that, otherwise use the current active cell.
+
+      // Create a MainAreaWidget
+      // const content = new Private.ClonedOutputArea({
+      //   notebook: current,
+      //   cell,
+      //   index,
+      //   translator
+      // });
+      // const widget = new MainAreaWidget({ content });
+      // current.context.addSibling(widget, {
+      //   ref: current.id,
+      //   mode: 'split-bottom'
+      // });
+
+      // const updateCloned = () => {
+      //   void clonedOutputs.save(widget);
+      // };
+
+      // current.context.pathChanged.connect(updateCloned);
+      // current.context.model?.cells.changed.connect(updateCloned);
+
+      // Add the cloned output to the output widget tracker.增加到notebook 的展示界面
+      // void clonedOutputs.add(widget);
+
+      // Remove the output view if the parent notebook is closed.移除事件
+      // current.content.disposed.connect(() => {
+      //   current!.context.pathChanged.disconnect(updateCloned);
+      //   current!.context.model?.cells.changed.disconnect(updateCloned);
+      //   widget.dispose();
+      // });
+    },
+    // isEnabled: isEnabledAndSingleSelected,需要增加一个确认该功能是否可用的函数
+  });
+
+  return
 }
 
 async function runCode(path: string) {

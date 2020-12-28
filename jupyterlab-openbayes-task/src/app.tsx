@@ -1,10 +1,6 @@
 import React, { useState,useEffect } from 'react'
 import * as ReactDOM from 'react-dom'
-import { Widget } from '@lumino/widgets'
 import { Switch } from '@material-ui/core';
-import {
-  IDisposable, DisposableDelegate
-} from '@lumino/disposable';
 
 import {
   DocumentRegistry
@@ -16,18 +12,22 @@ import {
 
 import {
   HTMLSelect,
-  runIcon
+  runIcon,
+  notebookIcon
 } from '@jupyterlab/ui-components';
 
 import {
-  Cell,CodeCell,isCodeCellModel
+  Cell,CodeCell,isCodeCellModel,ICodeCellModel
 } from '@jupyterlab/cells';
-
-import { PanelLayout } from '@lumino/widgets';
 
 import { 
   ToolbarButtonComponent,ReactWidget
 } from '@jupyterlab/apputils';
+
+import { ArrayExt } from '@lumino/algorithm';
+import {UUID} from '@lumino/coreutils';
+import {IDisposable, DisposableDelegate} from '@lumino/disposable';
+import { Panel,PanelLayout,Widget } from '@lumino/widgets';
 
 
 const TOOLBAR_SELECTTYPE_DROPDOWN_CLASS = 'jp-Notebook-toolbarCellTypeDropdown select';
@@ -45,6 +45,11 @@ export interface IProps {
 export class LeftPanelWidget extends Widget {
   constructor(props: IProps = {}) {
     super()
+    this.id = 'openbayes-task-widget'
+    this.title.iconClass = 'task-icon'
+    this.title.caption = 'OpenBayes Task'
+    this.title.closable = true
+    this.addClass('task-widget')
     ReactDOM.render(<LeftPanelComponent runCodes={props.runCodes} />, this.node)
   }
 }
@@ -357,46 +362,37 @@ export function createRunButton(
   panel: NotebookPanel,
   cell: CodeCell
 ): Widget {
-  let count = 0;
   function onClick() {
-    void NotebookActions.run(panel.content, panel.sessionContext).then(()=>{
-      count = cell.model.executionCount;
-    });
+    void NotebookActions.run(panel.content, panel.sessionContext)
   }
-  
   return ReactWidget.create(
-    <RunButtonComponent panel={panel} cell={cell} onClickEvent={onClick} runTime={count}></RunButtonComponent>
+    <RunButtonComponent panel={panel} cell={cell} onClickEvent={onClick}></RunButtonComponent>
     );
 }
 interface RunButtonComponentProps {
   panel: NotebookPanel;
   cell: CodeCell;
-  runTime:number;
   onClickEvent:()=>void;
 }
-const RunButtonComponent = ({panel,cell,onClickEvent,runTime}:RunButtonComponentProps)=>{
+const RunButtonComponent = ({panel,cell,onClickEvent}:RunButtonComponentProps)=>{
   const [showRun,setShowRun] = useState(false);
-  // const [runTime,setRunTime] = useState(0);
+  const [runTime,setRunTime] = useState(0);
   let delayTimer:any = null;
 
   useEffect(()=>{
     if(cell.model){
-      const count = cell.model.executionCount;
-      console.log(count);
-      runTime = count;
+      const count = (cell.model as ICodeCellModel).executionCount;
+      setRunTime(count);
     }
   },[cell])
 
   const clickRunButton = ()=>{
+    console.log('点击了按钮')
     setShowRun(false);
     onClickEvent();
-    console.log('点击了按钮')
-    // 获取当前 cell 的运行索引, 只有 CodeCell 具有 executionCount 属性
-    // if(cell.model){
-    //   const count = cell.model.executionCount
-    //   console.log(count);
-    //   setRunTime(count);
-    // }
+    const value = (cell.model as ICodeCellModel).executionCount;
+    // todo: 存在bug 数字标号未及时更新
+    setRunTime(value);
   }
   const changeRunButton = (value:boolean)=>{
     if(delayTimer){
@@ -409,12 +405,12 @@ const RunButtonComponent = ({panel,cell,onClickEvent,runTime}:RunButtonComponent
   };
   return(
   <div
-    style={{ display: 'flex', flexDirection: 'row', justifyContent: 'flex-end'}}
+    style={{ display: 'flex', flexDirection: 'row', justifyContent: 'flex-end', minHeight: '25px'}}
     onMouseEnter={()=>changeRunButton(true)}
     onMouseLeave={()=>changeRunButton(false)}
   >
     {
-      showRun &&
+      showRun ?
       <div >
         <ToolbarButtonComponent
           icon={runIcon}
@@ -430,12 +426,89 @@ const RunButtonComponent = ({panel,cell,onClickEvent,runTime}:RunButtonComponent
           }
         />
       </div>
-      // :
-      // <div 
-      //   className={'lm-Widget p-Widget'}
-      // >[{runTime > 0 ? runTime: ' '}]:
-      // </div>
+      :
+      <div 
+        className={'lm-Widget p-Widget'}
+      >[{runTime && runTime > 0 ? runTime: ' '}]:
+      </div>
     }
     </div>
     )
+}
+export namespace ClonedOutputArea {
+  export interface IOptions {
+    /**
+     * The notebook associated with the cloned output area.
+     */
+    notebook: NotebookPanel;
+
+    /**
+     * The cell for which to clone the output area.
+     */
+    cell?: CodeCell;
+
+    /**
+     * If the cell is not available, provide the index
+     * of the cell for when the notebook is loaded.
+     */
+    index?: number;
+
+    /**
+     * If the cell is not available, provide the index
+     * of the cell for when the notebook is loaded.
+     */
+    // translator?: ITranslator;
+  }
+}
+export class ClonedOutputArea extends Panel {
+  constructor(options: ClonedOutputArea.IOptions) {
+    super();
+    this._notebook = options.notebook;
+    this._index = options.index !== undefined ? options.index : -1;
+    this._cell = options.cell || null;
+    this.id = `LinkedOutputView-${UUID.uuid4()}`;
+    this.title.label = 'Output View';
+    this.title.icon = notebookIcon;
+    this.title.caption = this._notebook.title.label
+      ? `For Notebook: %1 ${this._notebook.title.label}`
+      : 'For Notebook:';
+    this.addClass('jp-LinkedOutputView');
+
+    // Wait for the notebook to be loaded before
+    // cloning the output area.
+    void this._notebook.context.ready.then(() => {
+      if (!this._cell) {
+        this._cell = this._notebook.content.widgets[this._index] as CodeCell;
+      }
+      if (!this._cell || this._cell.model.type !== 'code') {
+        this.dispose();
+        return;
+      }
+      const clone = this._cell.cloneOutputArea();
+      this.addWidget(clone);
+    });
+  }
+
+  /**
+   * The index of the cell in the notebook.
+   */
+  get index(): number {
+    return this._cell
+      ? ArrayExt.findFirstIndex(
+          this._notebook.content.widgets,
+          c => c === this._cell
+        )
+      : this._index;
+  }
+
+  /**
+   * The path of the notebook for the cloned output area.
+   */
+  get path(): string {
+    return this._notebook.context.path;
+  }
+
+  private _notebook: NotebookPanel;
+  private _index: number;
+  private _cell: CodeCell | null = null;
 }
