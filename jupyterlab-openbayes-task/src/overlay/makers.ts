@@ -57,6 +57,7 @@ export class MarkerManager {
   updateTaskButton(){
     const notebook = this._content;
       if(this._taskType === 'Default'){
+        this._buttonTracker = {}
         notebook.widgets.map((cell: Cell) => {
           RemoveSelectButton(cell);
           if(isCodeCellModel(cell.model)){
