@@ -23,13 +23,13 @@ import { DocumentManager,IDocumentManager, renameDialog } from '@jupyterlab/docm
 import { Widget } from '@lumino/widgets';
 
 import { LeftPanelWidget } from './app'
-import { initToolbar } from './overlay/index';
-import { MarkerManager } from './overlay/makers';
+import { initToolbar,MarkerManager } from './overlay/index';
 
 import {run, uploadRequest, uploadCode, getJobDetail} from './api'
 import { getEnvs } from "./env";
 
-export const NAMESPACE = 'openbayes-task'
+export const NAMESPACE = 'openbayes-task';
+
 namespace CommandIDs {
   export const createOutputFileView = 'notebook:create-output-file-view';
 }
@@ -165,6 +165,7 @@ function activateExtension(
   });
   const { commands } = app;
 
+  // todo：task 模式下有输出预览，default 需要移除；
   commands.addCommand(CommandIDs.createOutputFileView, {
     label: 'Create New File View for Output',
     execute: async args => {
