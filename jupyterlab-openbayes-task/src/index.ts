@@ -6,19 +6,25 @@ import {
 
 import { showErrorMessage } from '@jupyterlab/apputils'
 
-import { INotebookTracker } from '@jupyterlab/notebook'
+import { INotebookTracker,NotebookPanel,INotebookModel } from '@jupyterlab/notebook'
+import { DocumentRegistry } from '@jupyterlab/docregistry'
 
 import { isCodeCellModel } from '@jupyterlab/cells'
 
 import {
   IFileBrowserFactory
 } from '@jupyterlab/filebrowser';
+import { ISettingRegistry } from '@jupyterlab/settingregistry';
+
+import { DisposableDelegate,IDisposable } from "@lumino/disposable";
 
 import { DocumentManager,IDocumentManager, renameDialog } from '@jupyterlab/docmanager'
 
-// import { PanelLayout } from '@lumino/widgets';
+import { Widget } from '@lumino/widgets';
 
-import { LeftPanelWidget,SelectTypeExtension } from './app'
+import { LeftPanelWidget } from './app'
+import { initToolbar } from './overlay/index';
+import { MarkerManager } from './overlay/makers';
 
 import {run, uploadRequest, uploadCode, getJobDetail} from './api'
 import { getEnvs } from "./env";
@@ -41,11 +47,37 @@ const extension: JupyterFrontEndPlugin<void> = {
   activate: activateExtension
 }
 
-function activateExtension(app: JupyterFrontEnd,
+export class OpenBayesTaskExtension
+  implements DocumentRegistry.IWidgetExtension<NotebookPanel, INotebookModel> {
+    constructor(
+      app: JupyterFrontEnd,
+      documentManager: IDocumentManager,
+      settingRegistry: ISettingRegistry,
+      notebooks: INotebookTracker){
+    }
+    createNew(
+      notebook: NotebookPanel,
+      notebookContext: DocumentRegistry.IContext<INotebookModel>
+    ): IDisposable {
+      notebookContext.ready.then(() => {
+        this._toolbarWidgets = initToolbar(notebook);
+        new MarkerManager(notebook);
+      })
+
+      return new DisposableDelegate(() => {
+        this._toolbarWidgets.forEach(button => button.dispose());
+      });
+    }
+    private _toolbarWidgets: Widget[];
+}
+
+function activateExtension(
+  app: JupyterFrontEnd,
   restorer: ILayoutRestorer,
   tracker: INotebookTracker,
   factory: IFileBrowserFactory,
   docManager: IDocumentManager,
+  settingRegistry: ISettingRegistry
   ){
   console.log('JupyterLab extension jupyterlab-openbayes-task is activated!')
 
@@ -117,90 +149,15 @@ function activateExtension(app: JupyterFrontEnd,
 
   restorer.add(widget, NAMESPACE)
   app.shell.add(widget, 'left', { rank: 101 })
-
-  let select = new SelectTypeExtension({
-    runCodes: async() => {
-      let codes:string = '';
-      const notebookPanel = tracker.currentWidget;
-
-      if (notebookPanel === null) {
-        return
-      }
-
-      const nbWidget = notebookPanel.content;
-      const Type = notebookPanel.content.model.metadata.get('selectType');
-
-      if(Type === 'Default'){
-        // saveCode 不处理 default
-        // const cells = nbWidget.model.cells
-        // for (let index = 0; index < cells.length; index++) {
-        //   const cellModel = cells.get(index)
-        //   const isCodeCell = isCodeCellModel(cellModel)
-        //   if (!isCodeCell) {
-        //     continue
-        //   }
-
-        //   codes += cellModel.value.text + '\n\n'
-        // }
-      } else if(Type === 'Task'){
-        // 组合多段代码
-        const recordList = JSON.parse(nbWidget.model.metadata.get('cellRecords').toString())
-        const cells = nbWidget.widgets;
-        if(Object.keys(recordList).length === 0){
-          console.log('Code snippet not selected')
-          return;
-        }
-        for(let key in recordList){
-          cells.forEach(c=>{
-            const isCodeCell = isCodeCellModel(c.model)
-            if (isCodeCell && c.model.id === key) {
-              codes += `#################### cell ${key} begin #################### \n\n`
-              codes += c.model.value.text + '\n\n'
-              codes += `#################### cell ${key} end #################### \n\n`
-            }
-          })
-        }
-        console.log(codes)
-      }
-      const { commands } = app;
-
-      let model = await commands.execute('docmanager:new-untitled', {
-        path: "/",
-        type: 'file',
-        ext: 'py'
-      })
-
-      model.content = codes;
-      model.format = 'text'
-      await app.serviceManager.contents.save(model.path, model);
-
-      const opener: DocumentManager.IWidgetOpener = {
-        open: widget => {
-          if (!widget.id) {
-            widget.id = `document-manager-${++Private.id}`;
-          }
-          widget.title.dataset = {
-            'type': 'document-title',
-            ...widget.title.dataset
-          };
-          if (!widget.isAttached) {
-            app.shell.add(widget, "main");
-          }
-          app.shell.activateById(widget.id);
-        }
-      };
-      const registry = app.docRegistry;
-      const docManager = new DocumentManager({ registry: registry, manager: app.serviceManager, opener: opener });
-
-      model = await renameDialog(docManager, model.path).catch(error => {
-        if (error !== 'File not renamed') {
-          void showErrorMessage('Rename Error', error);
-        }
-      })
-    }
-  });
-  app.docRegistry.addWidgetExtension('Notebook', select);
   
+  let taskSelectExtension = new OpenBayesTaskExtension(
+    app,
+    docManager,
+    settingRegistry,
+    tracker
+  );
+  app.docRegistry.addWidgetExtension("Notebook", taskSelectExtension);
+
   app.contextMenu.addItem({
     command: CommandIDs.createOutputFileView,
     selector: '.jp-Notebook .jp-CodeCell',
@@ -238,6 +195,8 @@ function activateExtension(app: JupyterFrontEnd,
       }
       // 获取到了 codes 片段，需要输出到底部的 panel
       console.log(codes)
+
+      
       // let cell: CodeCell | undefined;
       // let current: NotebookPanel | undefined | null;
       // If we are given a notebook path and cell index, then
