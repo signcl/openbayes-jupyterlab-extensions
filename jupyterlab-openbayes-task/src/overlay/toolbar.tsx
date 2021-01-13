@@ -37,7 +37,7 @@ const SelectTypeComponent = ({notebook,saveCodes}:SelectTypeProps)=>{
       content.model.metadata.set('selectType','Task');
     } else {
       content.model.metadata.set('selectType','Default');
-      content.model.metadata.delete('cellRecords')
+      content.model.metadata.set('cellRecords','{}');
     }
   }
 
