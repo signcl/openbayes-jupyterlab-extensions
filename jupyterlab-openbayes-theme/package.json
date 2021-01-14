@@ -1,6 +1,6 @@
 {
   "name": "jupyterlab-openbayes-theme",
-  "version": "0.2.1",
+  "version": "0.2.2",
   "description": "OpenBayes Theme",
   "keywords": [
     "jupyter",
@@ -28,11 +28,15 @@
     "build": "tsc",
     "clean": "rimraf lib && rimraf tsconfig.tsbuildinfo",
     "prepare": "npm run clean && npm run build",
-    "watch": "tsc -w"
+    "watch": "tsc -w",
+    "watch-css": "sass --watch sass:style",
+    "css": "sass sass:style"
   },
   "dependencies": {
     "@jupyterlab/application": "^2.0.0",
-    "@jupyterlab/apputils": "^2.0.0"
+    "@jupyterlab/apputils": "^2.0.0",
+    "global": "^4.4.0",
+    "sass": "^1.32.4"
   },
   "devDependencies": {
     "rimraf": "~3.0.0",

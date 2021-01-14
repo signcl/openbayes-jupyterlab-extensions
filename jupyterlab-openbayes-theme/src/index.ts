@@ -12,6 +12,14 @@ import {
 
 const namespace = 'jupyterlab-openbayes-theme'
 
+const listener = (event: any) => {
+  if (!event.data) return;
+  if (event.data.startsWith('theme-color')) {
+    let theme = event.data.split(':')[1];
+    document.querySelector('html').setAttribute('data-color-mode', theme);
+  }
+};
+
 const extension: JupyterFrontEndPlugin<void> = {
   id: namespace + ':plugin',
   requires: [IThemeManager],
@@ -27,8 +35,20 @@ const extension: JupyterFrontEndPlugin<void> = {
       name: 'OpenBayes Theme',
       isLight: isLight,
       themeScrollbars: true,
-      load: () => manager.loadCSS(style),
-      unload: () => Promise.resolve(undefined)
+      load: () => {
+        manager.loadCSS(style)
+        if (window.self !== window.top) { // inside iframe
+          window.addEventListener('message', listener, false);
+          window.parent.postMessage('theme-color', '*')
+        }
+        return Promise.resolve()
+      },
+      unload: () => {
+        if (window.self !== window.top) { // inside iframe
+          window.removeEventListener('message', listener, false);
+        }
+        return Promise.resolve(undefined)
+      }
     });
   },
   autoStart: true,
