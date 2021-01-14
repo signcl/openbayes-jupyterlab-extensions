@@ -4,9 +4,9 @@ import {
   JupyterFrontEndPlugin
 } from '@jupyterlab/application'
 
-import { showErrorMessage } from '@jupyterlab/apputils'
+import { showErrorMessage,MainAreaWidget,WidgetTracker, } from '@jupyterlab/apputils'
 
-import { INotebookTracker,NotebookPanel,INotebookModel } from '@jupyterlab/notebook'
+import { INotebookTracker,NotebookTracker,NotebookPanel,INotebookModel } from '@jupyterlab/notebook'
 import { DocumentRegistry } from '@jupyterlab/docregistry'
 
 import { isCodeCellModel } from '@jupyterlab/cells'
@@ -23,7 +23,7 @@ import { DocumentManager,IDocumentManager, renameDialog } from '@jupyterlab/docm
 import { Widget } from '@lumino/widgets';
 
 import { LeftPanelWidget } from './app'
-import { initToolbar,MarkerManager } from './overlay/index';
+import { initToolbar,MarkerManager,ClonedOutputArea } from './overlay/index';
 
 import {run, uploadRequest, uploadCode, getJobDetail} from './api'
 import { getEnvs } from "./env";
@@ -77,7 +77,7 @@ function activateExtension(
   tracker: INotebookTracker,
   factory: IFileBrowserFactory,
   docManager: IDocumentManager,
-  settingRegistry: ISettingRegistry
+  settingRegistry: ISettingRegistry,
   ){
   console.log('JupyterLab extension jupyterlab-openbayes-task is activated!')
 
@@ -158,20 +158,46 @@ function activateExtension(
   );
   app.docRegistry.addWidgetExtension("Notebook", taskSelectExtension);
 
+  // 这里是 output view 的第一步
+  const selectedOutputs = new WidgetTracker<
+    MainAreaWidget<ClonedOutputArea>
+  >({
+    namespace: 'selected-outputs'
+  });
+ const notebookTracker = new NotebookTracker({ namespace: 'notebook' });
+  addCommands(
+    app,
+    docManager,
+    notebookTracker,
+    selectedOutputs,
+  )
+
   app.contextMenu.addItem({
     command: CommandIDs.createOutputFileView,
     selector: '.jp-Notebook .jp-CodeCell',
     rank: 10
   });
+  
+
+  return
+}
+
+function addCommands(
+  app: JupyterFrontEnd,
+  docManager: IDocumentManager,
+  tracker: NotebookTracker,
+  selectedOutputs: WidgetTracker<MainAreaWidget>,
+): void {
   const { commands } = app;
 
   // todo：task 模式下有输出预览，default 需要移除；
   commands.addCommand(CommandIDs.createOutputFileView, {
-    label: 'Create New File View for Output',
+    label: 'Create New File View for Select',
     execute: async args => {
       console.log(args)
       let codes:string = '';
       const notebookPanel = tracker.currentWidget;
+      let current: NotebookPanel | undefined | null;
 
       if (notebookPanel === null) {
         return
@@ -196,49 +222,38 @@ function activateExtension(
       }
       // 获取到了 codes 片段，需要输出到底部的 panel
       console.log(codes)
+      // Create a MainAreaWidget 添加一个部件用来展示 output 的内容
+      const content = new ClonedOutputArea({
+        notebook: current,
+        cellContent:codes,
+      });
+      const widget = new MainAreaWidget({ content });
+      current.context.addSibling(widget, {
+        ref: current.id,
+        mode: 'split-bottom'
+      });
 
-      
-      // let cell: CodeCell | undefined;
-      // let current: NotebookPanel | undefined | null;
-      // If we are given a notebook path and cell index, then
-      // use that, otherwise use the current active cell.
-
-      // Create a MainAreaWidget
-      // const content = new Private.ClonedOutputArea({
-      //   notebook: current,
-      //   cell,
-      //   index,
-      //   translator
-      // });
-      // const widget = new MainAreaWidget({ content });
-      // current.context.addSibling(widget, {
-      //   ref: current.id,
-      //   mode: 'split-bottom'
-      // });
-
+      // 处理变化
       // const updateCloned = () => {
-      //   void clonedOutputs.save(widget);
+      //   void selectedOutputs.save(widget);
       // };
 
       // current.context.pathChanged.connect(updateCloned);
       // current.context.model?.cells.changed.connect(updateCloned);
 
-      // Add the cloned output to the output widget tracker.增加到notebook 的展示界面
-      // void clonedOutputs.add(widget);
+      // // Add the cloned output to the output widget tracker.
+      // void selectedOutputs.add(widget);
 
-      // Remove the output view if the parent notebook is closed.移除事件
+      // // Remove the output view if the parent notebook is closed.
       // current.content.disposed.connect(() => {
       //   current!.context.pathChanged.disconnect(updateCloned);
       //   current!.context.model?.cells.changed.disconnect(updateCloned);
       //   widget.dispose();
       // });
-    },
+    }
     // isEnabled: isEnabledAndSingleSelected,需要增加一个确认该功能是否可用的函数
   });
-
-  return
 }
-
 async function runCode(path: string) {
 
   const env = await getEnvs()
