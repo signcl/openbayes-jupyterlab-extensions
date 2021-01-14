@@ -1,3 +1,4 @@
 .idea/
 */.idea/
 */tsconfig.tsbuildinfo
+**/.DS_Store

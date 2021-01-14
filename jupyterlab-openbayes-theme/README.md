@@ -37,4 +37,5 @@ jupyter lab build
 
 - Download the source zipball from [jupyterlab/jupyterlab](https://github.com/jupyterlab/jupyterlab)
 - Compare `packages/theme-light-extension` and `packages/theme-dark-extension` side by side
-- Copy and paste updated files and override the old ones in this repo
+- Copy and paste updated files and override the old ones in this repo(`sass/urls.scss` and `sass/variables.scss`)
+- Exec `npm run css` to build css files
