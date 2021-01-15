@@ -12,13 +12,27 @@ import {
 
 const namespace = 'jupyterlab-openbayes-theme'
 
-const listener = (event: any) => {
-  if (!event.data) return;
-  if (event.data.startsWith('theme-color')) {
-    let theme = event.data.split(':')[1];
-    document.querySelector('html').setAttribute('data-color-mode', theme);
+const parse_query_string = (query: string) => {
+  var vars = query.split("&");
+  var query_string: any = {};
+  for (var i = 0; i < vars.length; i++) {
+    var pair = vars[i].split("=");
+    var key = decodeURIComponent(pair[0]);
+    var value = decodeURIComponent(pair[1]);
+    // If first entry with this name
+    if (typeof query_string[key] === "undefined") {
+      query_string[key] = decodeURIComponent(value);
+      // If second entry with this name
+    } else if (typeof query_string[key] === "string") {
+      var arr = [query_string[key], decodeURIComponent(value)];
+      query_string[key] = arr;
+      // If third or later entry with this name
+    } else {
+      query_string[key].push(decodeURIComponent(value));
+    }
   }
-};
+  return query_string;
+}
 
 const extension: JupyterFrontEndPlugin<void> = {
   id: namespace + ':plugin',
@@ -27,28 +41,28 @@ const extension: JupyterFrontEndPlugin<void> = {
     const style = namespace + '/index.css';
 
     let isLight = true;
-    if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
-      isLight = false;
+    if (window.self !== window.top) { // inside iframe
+      let queryStr = window.location.search.substring(1);
+      let queryObj = parse_query_string(queryStr);
+      let theme = queryObj['theme'] || 'auto'
+      document.querySelector('html').setAttribute('data-color-mode', theme);
+      if (theme === 'dark') {
+        isLight = false
+      } else if (theme === 'auto' && window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+        isLight = false;
+      }
+    } else {
+      if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+        isLight = false;
+      }
     }
 
     manager.register({
       name: 'OpenBayes Theme',
       isLight: isLight,
       themeScrollbars: true,
-      load: () => {
-        manager.loadCSS(style)
-        if (window.self !== window.top) { // inside iframe
-          window.addEventListener('message', listener, false);
-          window.parent.postMessage('theme-color', '*')
-        }
-        return Promise.resolve()
-      },
-      unload: () => {
-        if (window.self !== window.top) { // inside iframe
-          window.removeEventListener('message', listener, false);
-        }
-        return Promise.resolve(undefined)
-      }
+      load: () => manager.loadCSS(style),
+      unload: () => Promise.resolve(undefined)
     });
   },
   autoStart: true,
