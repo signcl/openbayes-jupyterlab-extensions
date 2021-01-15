@@ -15,7 +15,7 @@ export namespace ClonedOutputArea {
     /**
      * task select cell content
      */
-    cellContent:any;
+    cellContent: any;
   }
 }
 export class ClonedOutputArea extends Panel {
@@ -39,6 +39,7 @@ export class ClonedOutputArea extends Panel {
         console.log('无内容');
         return;
       }
+      console.log('有内容，准备添加部件')
       const content = this._cellContent;
       let contentDom = new Widget({ node: document.createElement('div') });
       // contentDom.addClass('jp-GatherLabel');
