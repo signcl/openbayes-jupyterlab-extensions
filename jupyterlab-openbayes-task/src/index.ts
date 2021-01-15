@@ -17,6 +17,7 @@ import {
 import { ISettingRegistry } from '@jupyterlab/settingregistry';
 
 import { DisposableDelegate,IDisposable } from "@lumino/disposable";
+import { ReadonlyPartialJSONObject } from '@lumino/coreutils';
 
 import { DocumentManager,IDocumentManager, renameDialog } from '@jupyterlab/docmanager'
 
@@ -164,11 +165,13 @@ function activateExtension(
   >({
     namespace: 'selected-outputs'
   });
- const notebookTracker = new NotebookTracker({ namespace: 'notebook' });
+ const notebookTracker = new NotebookTracker({ namespace: 'notebook-openbayes' });
+
   addCommands(
     app,
     docManager,
     notebookTracker,
+    tracker,
     selectedOutputs,
   )
 
@@ -178,7 +181,6 @@ function activateExtension(
     rank: 10
   });
   
-
   return
 }
 
@@ -186,23 +188,37 @@ function addCommands(
   app: JupyterFrontEnd,
   docManager: IDocumentManager,
   tracker: NotebookTracker,
+  pageTracker:INotebookTracker,
   selectedOutputs: WidgetTracker<MainAreaWidget>,
 ): void {
-  const { commands } = app;
+  const { commands,shell } = app;
+  console.log('addcommands 的 tracker',tracker);
+  console.log('插件的 tracker',pageTracker);
+  function getCurrent(args: ReadonlyPartialJSONObject): NotebookPanel | null {
+    const widget = tracker.currentWidget;
+    const activate = args['activate'] !== false;
 
+    if (activate && widget) {
+      shell.activateById(widget.id);
+    }
+
+    return widget;
+  }
   // todo：task 模式下有输出预览，default 需要移除；
   commands.addCommand(CommandIDs.createOutputFileView, {
     label: 'Create New File View for Select',
     execute: async args => {
       console.log(args)
       let codes:string = '';
-      const notebookPanel = tracker.currentWidget;
       let current: NotebookPanel | undefined | null;
+      current = getCurrent({ ...args, activate: false });
 
-      if (notebookPanel === null) {
+      if (current === null) {
+        console.log('没有 current')
         return
       }
-      const nbWidget = notebookPanel.content;
+
+      const nbWidget = current.content;
       const recordList = JSON.parse(nbWidget.model.metadata.get('cellRecords').toString())
       const cells = nbWidget.widgets;
 
@@ -221,28 +237,25 @@ function addCommands(
         })
       }
       // 获取到了 codes 片段，需要输出到底部的 panel
-      console.log(codes)
+      console.log(codes);
       // Create a MainAreaWidget 添加一个部件用来展示 output 的内容
       const content = new ClonedOutputArea({
         notebook: current,
         cellContent:codes,
       });
       const widget = new MainAreaWidget({ content });
-      current.context.addSibling(widget, {
-        ref: current.id,
-        mode: 'split-bottom'
-      });
+      current.context.addSibling(widget);
 
       // 处理变化
-      // const updateCloned = () => {
-      //   void selectedOutputs.save(widget);
-      // };
+      const updateCloned = () => {
+        void selectedOutputs.save(widget);
+      };
 
-      // current.context.pathChanged.connect(updateCloned);
-      // current.context.model?.cells.changed.connect(updateCloned);
+      current.context.pathChanged.connect(updateCloned);
+      current.context.model.cells.changed.connect(updateCloned);
 
       // // Add the cloned output to the output widget tracker.
-      // void selectedOutputs.add(widget);
+      void selectedOutputs.add(widget);
 
       // // Remove the output view if the parent notebook is closed.
       // current.content.disposed.connect(() => {
