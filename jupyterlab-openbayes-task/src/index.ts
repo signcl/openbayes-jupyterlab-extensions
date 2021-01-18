@@ -205,8 +205,6 @@ function addCommands(
   commands.addCommand(CommandIDs.createOutputFileView, {
     label: 'Create New File View for Select',
     execute: async args => {
-      console.log(args)
-      let codes:string = '';
       let current: NotebookPanel | undefined | null;
       current = getCurrent({ ...args, activate: false });
 
@@ -214,31 +212,9 @@ function addCommands(
         console.log('没有 current')
         return
       }
-
-      const nbWidget = current.content;
-      const recordList = JSON.parse(nbWidget.model.metadata.get('cellRecords').toString())
-      const cells = nbWidget.widgets;
-
-      if(Object.keys(recordList).length === 0){
-        console.log('Code snippet not selected')
-        return;
-      }
-      for(let key in recordList){
-        cells.forEach(c=>{
-          const isCodeCell = isCodeCellModel(c.model)
-          if (isCodeCell && c.model.id === key) {
-            codes += `#################### cell ${key} begin #################### \n\n`
-            codes += c.model.value.text + '\n\n'
-            codes += `#################### cell ${key} end #################### \n\n`
-          }
-        })
-      }
-      // 获取到了 codes 片段，需要输出到底部的 panel
-      console.log(codes);
       // Create a MainAreaWidget 添加一个部件用来展示 output 的内容
       const content = new ClonedOutputArea({
-        notebook: current,
-        cellContent:codes,
+        notebook: current
       });
       const widget = new MainAreaWidget({ content });
       current.context.addSibling(widget);
