@@ -6,7 +6,7 @@ import {
 
 import { showErrorMessage,MainAreaWidget,WidgetTracker, } from '@jupyterlab/apputils'
 
-import { INotebookTracker,NotebookTracker,NotebookPanel,INotebookModel } from '@jupyterlab/notebook'
+import { INotebookTracker,NotebookPanel,INotebookModel } from '@jupyterlab/notebook'
 import { DocumentRegistry } from '@jupyterlab/docregistry'
 
 import { isCodeCellModel } from '@jupyterlab/cells'
@@ -165,12 +165,10 @@ function activateExtension(
   >({
     namespace: 'selected-outputs'
   });
- const notebookTracker = new NotebookTracker({ namespace: 'notebook-openbayes' });
 
   addCommands(
     app,
     docManager,
-    notebookTracker,
     tracker,
     selectedOutputs,
   )
@@ -187,15 +185,14 @@ function activateExtension(
 function addCommands(
   app: JupyterFrontEnd,
   docManager: IDocumentManager,
-  tracker: NotebookTracker,
   pageTracker:INotebookTracker,
   selectedOutputs: WidgetTracker<MainAreaWidget>,
 ): void {
+  // jupyter 已经定义了 名为 notebook 的 tracker，直接复用
   const { commands,shell } = app;
-  console.log('addcommands 的 tracker',tracker);
   console.log('插件的 tracker',pageTracker);
   function getCurrent(args: ReadonlyPartialJSONObject): NotebookPanel | null {
-    const widget = tracker.currentWidget;
+    const widget = pageTracker.currentWidget;
     const activate = args['activate'] !== false;
 
     if (activate && widget) {
