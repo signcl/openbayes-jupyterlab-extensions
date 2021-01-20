@@ -52,16 +52,19 @@ export class OpenBayesTaskExtension
   implements DocumentRegistry.IWidgetExtension<NotebookPanel, INotebookModel> {
     constructor(
       app: JupyterFrontEnd,
+      tracker:INotebookTracker,
       documentManager: IDocumentManager,
       settingRegistry: ISettingRegistry,
       notebooks: INotebookTracker){
+        this._app = app;
+        this._tracker = tracker;
     }
     createNew(
       notebook: NotebookPanel,
       notebookContext: DocumentRegistry.IContext<INotebookModel>
     ): IDisposable {
       notebookContext.ready.then(() => {
-        this._toolbarWidgets = initToolbar(notebook);
+        this._toolbarWidgets = initToolbar(this._app,this._tracker,notebook);
         new MarkerManager(notebook);
       })
 
@@ -70,6 +73,8 @@ export class OpenBayesTaskExtension
       });
     }
     private _toolbarWidgets: Widget[];
+    private _app:JupyterFrontEnd;
+    private _tracker:INotebookTracker;
 }
 
 function activateExtension(
@@ -96,8 +101,9 @@ function activateExtension(
           if (!isCodeCell) {
             continue
           }
-
-          codes += cellModel.value.text + '\n\n'
+          codes += `#################### cell ${cellModel.id} begin #################### \n\n`;
+          codes += cellModel.value.text + '\n\n';
+          codes += `#################### cell ${cellModel.id} end #################### \n\n`;
         }
       }
 
@@ -153,6 +159,7 @@ function activateExtension(
   
   let taskSelectExtension = new OpenBayesTaskExtension(
     app,
+    tracker,
     docManager,
     settingRegistry,
     tracker
