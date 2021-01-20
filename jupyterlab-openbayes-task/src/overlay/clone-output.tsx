@@ -46,19 +46,25 @@ export class ClonedOutputArea extends Panel {
     }
     for(let key in recordList){
       cells.forEach(c=>{
-        let codes = ''
         const isCodeCell = isCodeCellModel(c.model)
         if (isCodeCell && c.model.id === key) {
-          codes += `#################### cell ${key} begin #################### \n\n`
-          codes += c.model.value.text + '\n\n'
-          codes += `#################### cell ${key} end #################### \n\n`
+          let beigin = `#################### cell ${key} begin #################### \n\n`
+          this.createWidget(beigin);
+          let cellValue = c.model.value.text.split('\n');
+          cellValue.forEach(content=>{
+            this.createWidget(content);
+          })
+          let end = `#################### cell ${key} end #################### \n\n`;
+          this.createWidget(end);
         }
-        let contentDom = new Widget({ node: document.createElement('div') });
-        contentDom.node.textContent = codes;
-        this.addWidget(contentDom);
-        // this._widgetList.push(contentDom);
       })
     }
+  }
+
+  createWidget(content:string){
+      let contentDom = new Widget({ node: document.createElement('div') });
+      contentDom.node.textContent = content;
+      this.addWidget(contentDom);
   }
 
   private _notebook: NotebookPanel;

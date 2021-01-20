@@ -217,15 +217,16 @@ function addCommands(
         notebook: current
       });
       const widget = new MainAreaWidget({ content });
-      current.context.addSibling(widget);
+      current.context.addSibling(widget, {
+        ref: current.id,
+        mode: 'split-bottom'
+      });
 
       // 处理变化
       const updateCloned = () => {
         void selectedOutputs.save(widget);
       };
-
-      current.context.pathChanged.connect(updateCloned);
-      current.context.model.cells.changed.connect(updateCloned);
+      current.content.activeCellChanged.connect(updateCloned);
 
       // // Add the cloned output to the output widget tracker.
       void selectedOutputs.add(widget);
