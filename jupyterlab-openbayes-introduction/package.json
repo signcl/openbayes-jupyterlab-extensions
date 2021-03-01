@@ -1,6 +1,6 @@
 {
   "name": "jupyterlab-openbayes-introduction",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "description": "OpenBayes Introduction",
   "keywords": [
     "jupyter",
@@ -31,11 +31,11 @@
     "watch": "tsc -w"
   },
   "dependencies": {
-    "@jupyterlab/application": "^3.0.0",
-    "@jupyterlab/filebrowser": "^3.0.0",
-    "@jupyterlab/mainmenu": "^3.0.0",
-    "@jupyterlab/statedb": "^3.0.0",
-    "@lumino/widgets": "^1.17.0"
+    "@jupyterlab/application": "^3.0.6",
+    "@jupyterlab/filebrowser": "^3.0.6",
+    "@jupyterlab/mainmenu": "^3.0.5",
+    "@jupyterlab/statedb": "^3.0.3",
+    "@lumino/widgets": "^1.18.0"
   },
   "devDependencies": {
     "rimraf": "~3.0.2",
