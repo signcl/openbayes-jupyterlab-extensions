@@ -1,0 +1,21 @@
+{
+  "name": "openbayes-jupyterlab-extensions",
+  "version": "1.0.0",
+  "description": "OpenBayes extensions for JupyterLab",
+  "main": "index.js",
+  "author": "OpenBayes",
+  "license": "MIT",
+  "private": true,
+  "workspaces": [
+    "packages/*"
+  ],
+  "scripts": {
+    "theme:test": "yarn workspace jupyterlab-openbayes-theme test",
+    "theme:build": "yarn workspace jupyterlab-openbayes-theme build",
+    "theme:start": "yarn workspace jupyterlab-openbayes-theme start",
+    "release": "yarn lerna publish"
+  },
+  "devDependencies": {
+    "lerna": "^4.0.0"
+  }
+}
