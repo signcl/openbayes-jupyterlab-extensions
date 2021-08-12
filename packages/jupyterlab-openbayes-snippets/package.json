@@ -30,6 +30,10 @@
     "prepare": "jlpm run clean && jlpm run build",
     "watch": "tsc -w"
   },
+  "publishConfig": {
+    "access": "public",
+    "registry": "https://registry.npmjs.org/"
+  },
   "dependencies": {
     "@jupyterlab/application": "^2.0.0",
     "@jupyterlab/apputils": "^2.0.0",

@@ -32,6 +32,10 @@
     "watch-css": "sass --watch sass:style",
     "css": "sass sass:style"
   },
+  "publishConfig": {
+    "access": "public",
+    "registry": "https://registry.npmjs.org/"
+  },
   "dependencies": {
     "@jupyterlab/application": "^3.0.7",
     "@jupyterlab/apputils": "^3.0.5",
