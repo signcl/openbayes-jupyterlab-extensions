@@ -1,5 +1,13 @@
 # JupyterLab OpenBayes Extensions
 
+[![npm version](https://img.shields.io/npm/v/jupyterlab-openbayes-bindings.svg?style=flat)](https://www.npmjs.com/package/jupyterlab-openbayes-bindings)
+[![npm version](https://img.shields.io/npm/v/jupyterlab-openbayes-dataset-browser.svg?style=flat)](https://www.npmjs.com/package/jupyterlab-openbayes-dataset-browser)
+[![npm version](https://img.shields.io/npm/v/jupyterlab-openbayes-filebrowser-overwrite.svg?style=flat)](https://www.npmjs.com/package/jupyterlab-openbayes-filebrowser-overwrite)
+[![npm version](https://img.shields.io/npm/v/jupyterlab-openbayes-introduction.svg?style=flat)](https://www.npmjs.com/package/jupyterlab-openbayes-introduction)
+[![npm version](https://img.shields.io/npm/v/jupyterlab-openbayes-snippets.svg?style=flat)](https://www.npmjs.com/package/jupyterlab-openbayes-snippets)
+[![npm version](https://img.shields.io/npm/v/jupyterlab-openbayes-task.svg?style=flat)](https://www.npmjs.com/package/jupyterlab-openbayes-task)
+[![npm version](https://img.shields.io/npm/v/jupyterlab-openbayes-theme.svg?style=flat)](https://www.npmjs.com/package/jupyterlab-openbayes-theme)
+
 [Extension Developer Guide](https://jupyterlab.readthedocs.io/en/stable/developer/extension_dev.html)
 
 ## 开发计划

@@ -46,5 +46,6 @@
   ],
   "jupyterlab": {
     "extension": true
-  }
+  },
+  "gitHead": "7a5c8c35ddf902c026b16bb54c90a551c3a27498"
 }
