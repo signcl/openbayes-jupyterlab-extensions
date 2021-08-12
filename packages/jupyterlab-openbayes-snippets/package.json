@@ -1,6 +1,6 @@
 {
   "name": "jupyterlab-openbayes-snippets",
-  "version": "0.2.0",
+  "version": "1.0.1",
   "description": "OpenBayes Snippets",
   "keywords": [
     "jupyter",

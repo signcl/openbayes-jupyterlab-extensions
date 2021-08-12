@@ -1,6 +1,6 @@
 {
   "name": "jupyterlab-openbayes-introduction",
-  "version": "0.3.1",
+  "version": "1.0.1",
   "description": "OpenBayes Introduction",
   "keywords": [
     "jupyter",
