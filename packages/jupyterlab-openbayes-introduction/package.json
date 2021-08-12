@@ -30,6 +30,10 @@
     "prepare": "npm run clean && npm run build",
     "watch": "tsc -w"
   },
+  "publishConfig": {
+    "access": "public",
+    "registry": "https://registry.npmjs.org/"
+  },
   "dependencies": {
     "@jupyterlab/application": "^3.0.7",
     "@jupyterlab/filebrowser": "^3.0.7",
