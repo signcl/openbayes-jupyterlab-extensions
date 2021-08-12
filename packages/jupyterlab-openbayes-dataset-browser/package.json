@@ -1,6 +1,6 @@
 {
   "name": "jupyterlab-openbayes-dataset-browser",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "OpenBayes Dataset Browser",
   "keywords": [
     "jupyter",

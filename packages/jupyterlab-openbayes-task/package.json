@@ -1,6 +1,6 @@
 {
   "name": "jupyterlab-openbayes-task",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "OpenBayes Task",
   "keywords": [
     "jupyter",
