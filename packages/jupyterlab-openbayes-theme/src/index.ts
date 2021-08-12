@@ -1,17 +1,18 @@
-import {
-  JupyterFrontEnd, JupyterFrontEndPlugin
-} from '@jupyterlab/application';
-
-import {
-  IThemeManager
-} from '@jupyterlab/apputils';
-
+// Copyright (c) Jupyter Development Team.
+// Distributed under the terms of the Modified BSD License.
 /**
- * Initialization data for the jupyterlab-openbayes-theme extension.
+ * @packageDocumentation
+ * @module theme-light-extension
  */
 
-const namespace = 'jupyterlab-openbayes-theme'
+import {
+  JupyterFrontEnd,
+  JupyterFrontEndPlugin
+} from '@jupyterlab/application';
+import { IThemeManager } from '@jupyterlab/apputils';
+import { ITranslator } from '@jupyterlab/translation';
 
+// Begin openbayes-jupyterlab-extensions
 const parse_query_string = (query: string) => {
   var vars = query.split("&");
   var query_string: any = {};
@@ -33,13 +34,23 @@ const parse_query_string = (query: string) => {
   }
   return query_string;
 }
+// End openbayes-jupyterlab-extensions
 
-const extension: JupyterFrontEndPlugin<void> = {
-  id: namespace + ':plugin',
-  requires: [IThemeManager],
-  activate: (app: JupyterFrontEnd, manager: IThemeManager) => {
-    const style = namespace + '/index.css';
+/**
+ * A plugin for the Jupyter Light Theme.
+ */
+const plugin: JupyterFrontEndPlugin<void> = {
+  id: 'jupyterlab-openbayes-theme:plugin',
+  requires: [IThemeManager, ITranslator],
+  activate: (
+    app: JupyterFrontEnd,
+    manager: IThemeManager,
+    translator: ITranslator
+  ) => {
+    const trans = translator.load('jupyterlab');
+    const style = 'jupyterlab-openbayes-theme/index.css';
 
+    // Begin openbayes-jupyterlab-extensions
     let isLight = true;
     if (window.self !== window.top) { // inside iframe
       let queryStr = window.location.search.substring(1);
@@ -56,16 +67,18 @@ const extension: JupyterFrontEndPlugin<void> = {
         isLight = false;
       }
     }
+    // End openbayes-jupyterlab-extensions
 
     manager.register({
-      name: 'OpenBayes Theme',
+      name: 'OpenBayes Theme Next',
+      displayName: trans.__('OpenBayes Theme Next'),
       isLight: isLight,
-      themeScrollbars: true,
+      themeScrollbars: false,
       load: () => manager.loadCSS(style),
       unload: () => Promise.resolve(undefined)
     });
   },
-  autoStart: true,
+  autoStart: true
 };
 
-export default extension;
+export default plugin;

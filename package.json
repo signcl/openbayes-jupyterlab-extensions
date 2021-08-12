@@ -10,9 +10,8 @@
     "packages/*"
   ],
   "scripts": {
-    "theme:test": "yarn workspace jupyterlab-openbayes-theme test",
-    "theme:build": "yarn workspace jupyterlab-openbayes-theme build",
-    "theme:start": "yarn workspace jupyterlab-openbayes-theme start",
+    "theme": "yarn workspace jupyterlab-openbayes-theme",
+    "theme:load": "jupyter labextension install packages/jupyterlab-openbayes-theme/",
     "release": "yarn lerna publish"
   },
   "devDependencies": {

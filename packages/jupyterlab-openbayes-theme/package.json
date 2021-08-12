@@ -33,10 +33,10 @@
     "css": "sass sass:style"
   },
   "dependencies": {
-    "@jupyterlab/application": "^3.0.7",
-    "@jupyterlab/apputils": "^3.0.5",
-    "global": "^4.4.0",
-    "sass": "^1.32.8"
+    "@jupyterlab/application": "^3.1.5",
+    "@jupyterlab/apputils": "^3.1.5",
+    "@jupyterlab/theme-light-extension": "^3.1.5",
+    "kladenets": "^2.0.0-8"
   },
   "devDependencies": {
     "rimraf": "~3.0.2",

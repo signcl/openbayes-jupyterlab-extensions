@@ -1,21 +1,75 @@
-/*-----------------------------------------------------------------------------
-| Copyright (c) Jupyter Development Team.
-| Distributed under the terms of the Modified BSD License.
-|----------------------------------------------------------------------------*/
+/* Directly import original styles to avoid duplication */
+/* Follow further updates at:
+    https://github.com/jupyterlab/jupyterlab/tree/v3.1.5/packages/theme-light-extension
+*/
+@import '~@jupyterlab/theme-light-extension/style/theme.css';
+@import '~kladenets';
+@import '~kladenets/dist/kladenets-material-map.css';
 
-@import './variables.css';
-@import './urls.css';
+:root {
+    /* JupyterLab resets */
+    --jp-border-color0: var(--text-color-30);
+    --jp-border-color1: var(--text-color-20);
+    --jp-border-color2: var(--text-color-10);
+    --jp-border-color3: var(--text-color-7);
 
-/* OpenBayes mod */
-/* @import './openbayes.css'; */
+    --jp-ui-font-color0: var(--text-color);
+    --jp-ui-font-color1: var(--text-color-90);
+    --jp-ui-font-color2: var(--text-color-50);
+    --jp-ui-font-color3: var(--text-color-40);
 
-/* Set the default typography for monospace elements */
-tt,
-code,
-kbd,
-samp,
-pre {
-    font-family: var(--jp-code-font-family);
-    font-size: var(--jp-code-font-size);
-    line-height: var(--jp-code-line-height);
+    --jp-ui-inverse-font-color0: var(--bg-color);
+    --jp-ui-inverse-font-color1: var(--bg-color);
+    --jp-ui-inverse-font-color2: var(--bg-color-70);
+    --jp-ui-inverse-font-color3: var(--bg-color-50);
+
+    --jp-content-font-color0: var(--text-color);
+    --jp-content-font-color1: var(--text-color-90);
+    --jp-content-font-color2: var(--text-color-50);
+    --jp-content-font-color3: var(--text-color-40);
+
+    --jp-layout-color0: var(--bg-color);
+    --jp-layout-color1: var(--bg-color);
+    --jp-layout-color2: hsl(var(--text-color-h) 20% calc(var(--bg-color-l) - calc(10% * var(--theme-scheme-multiplier))));
+    --jp-layout-color3: hsl(var(--text-color-h) 20% calc(var(--bg-color-l) - calc(20% * var(--theme-scheme-multiplier))));
+    --jp-layout-color4: hsl(var(--text-color-h) 20% calc(var(--bg-color-l) - calc(30% * var(--theme-scheme-multiplier))));
+
+    --jp-inverse-layout-color0: var(--text-color);
+    --jp-inverse-layout-color1: var(--text-color-90);
+    --jp-inverse-layout-color2: var(--text-color-80);
+    --jp-inverse-layout-color3: var(--text-color-70);
+    --jp-inverse-layout-color4: var(--text-color-60);
+}
+
+html {
+    background-color: var(--bg-color);
+}
+
+@media (prefers-color-scheme: dark) {
+    :root:not([data-color-mode=light]) {
+        --theme-scheme-multiplier: -1;
+
+        --blue-l: 70%;
+        --indigo-l: 71%;
+        --purple-l: 80%;
+        --pink-l: 83%;
+        --red-l: 75%;
+        --orange-l: 74%;
+        --yellow-l: 80%;
+        --green-l: 80%;
+        --teal-l: 75%;
+        --cyan-l: 80%;
+
+        --text-color-h: 213;
+        --text-color-s: 32%;
+        --text-color-l: 70%;
+
+        --link-color-h: 202;
+        --link-color-s: 100%;
+        --link-color-l: 60%;
+
+        --bg-color-h: 220;
+        --bg-color-s: 10%;
+        --bg-color-l: 12%;
+    }
 }
