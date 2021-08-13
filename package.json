@@ -10,6 +10,18 @@
     "packages/*"
   ],
   "scripts": {
+    "bindings": "yarn workspace jupyterlab-openbayes-bindings",
+    "bindings:load": "jupyter labextension install packages/jupyterlab-openbayes-bindings/",
+    "dataset": "yarn workspace jupyterlab-openbayes-dataset-browser",
+    "dataset:load": "jupyter labextension install packages/jupyterlab-openbayes-browser/",
+    "fb": "yarn workspace jupyterlab-openbayes-filebrowser-overwrite",
+    "fb:load": "jupyter labextension install packages/jupyterlab-openbayes-filebrowser-overwrite/",
+    "introduction": "yarn workspace jupyterlab-openbayes-introduction",
+    "introduction:load": "jupyter labextension install packages/jupyterlab-openbayes-introduction/",
+    "snippets": "yarn workspace jupyterlab-openbayes-snippets",
+    "snippets:load": "jupyter labextension install packages/jupyterlab-openbayes-snippets/",
+    "task": "yarn workspace jupyterlab-openbayes-task",
+    "task:load": "jupyter labextension install packages/jupyterlab-openbayes-task/",
     "theme": "yarn workspace jupyterlab-openbayes-theme",
     "theme:load": "jupyter labextension install packages/jupyterlab-openbayes-theme/",
     "release": "yarn lerna publish"

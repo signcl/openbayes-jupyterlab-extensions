@@ -35,8 +35,10 @@
     "registry": "https://registry.npmjs.org/"
   },
   "dependencies": {
-    "@jupyterlab/application": "^3.0.7",
-    "@jupyterlab/filebrowser": "^3.0.7"
+    "@jupyterlab/application": "^3.1.5",
+    "@jupyterlab/apputils": "^3.1.5",
+    "@jupyterlab/filebrowser": "^3.1.5",
+    "@jupyterlab/ui-components": "^3.1.5"
   },
   "devDependencies": {
     "rimraf": "^3.0.2",
