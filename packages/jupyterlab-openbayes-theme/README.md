@@ -21,15 +21,15 @@ jupyter labextension install jupyterlab-openbayes-theme
 For a development install (requires npm version 4 or later), do the following in the repository directory:
 
 ```bash
-npm install
-npm run build
+yarn install
+yarn build
 jupyter labextension link .
 ```
 
 To rebuild the package and the JupyterLab app:
 
 ```bash
-npm run build
+yarn build
 jupyter lab build
 ```
 
@@ -37,5 +37,4 @@ jupyter lab build
 
 - Download the source zipball from [jupyterlab/jupyterlab](https://github.com/jupyterlab/jupyterlab)
 - Compare `packages/theme-light-extension` and `packages/theme-dark-extension` side by side
-- Copy and paste updated files and override the old ones in this repo(`sass/urls.scss` and `sass/variables.scss`)
-- Exec `npm run css` to build css files
+- Copy and paste updated files and override the old ones in this repo
