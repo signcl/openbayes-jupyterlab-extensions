@@ -30,15 +30,45 @@
 
     --jp-layout-color0: var(--bg-color);
     --jp-layout-color1: var(--bg-color);
-    --jp-layout-color2: hsl(var(--text-color-h) 20% calc(var(--bg-color-l) - calc(10% * var(--theme-scheme-multiplier))));
-    --jp-layout-color3: hsl(var(--text-color-h) 20% calc(var(--bg-color-l) - calc(20% * var(--theme-scheme-multiplier))));
-    --jp-layout-color4: hsl(var(--text-color-h) 20% calc(var(--bg-color-l) - calc(30% * var(--theme-scheme-multiplier))));
+    --jp-layout-color2: hsl(var(--text-color-h) 20% calc(var(--bg-color-l) - calc(10% * var(--theme-scheme-multiplier, 1))));
+    --jp-layout-color3: hsl(var(--text-color-h) 20% calc(var(--bg-color-l) - calc(20% * var(--theme-scheme-multiplier, 1))));
+    --jp-layout-color4: hsl(var(--text-color-h) 20% calc(var(--bg-color-l) - calc(30% * var(--theme-scheme-multiplier, 1))));
 
     --jp-inverse-layout-color0: var(--text-color);
     --jp-inverse-layout-color1: var(--text-color-90);
     --jp-inverse-layout-color2: var(--text-color-80);
     --jp-inverse-layout-color3: var(--text-color-70);
     --jp-inverse-layout-color4: var(--text-color-60);
+
+    --jp-cell-inprompt-font-color: var(--link-color);
+    --jp-cell-outprompt-font-color: var(--code-color);
+
+    --jp-rendermime-error-background: var(--red-10);
+
+    --jp-mirror-editor-keyword-color: var(--green);
+    --jp-mirror-editor-atom-color: var(--deep-purple);
+    --jp-mirror-editor-number-color: var(--green);
+    --jp-mirror-editor-def-color: var(--blue);
+    --jp-mirror-editor-variable-color: var(--md-grey-900);
+    --jp-mirror-editor-variable-2-color: var(--indigo);
+    --jp-mirror-editor-variable-3-color: var(--light-green);
+    --jp-mirror-editor-punctuation-color: var(--light-blue);
+    --jp-mirror-editor-property-color: var(--cyan);
+    --jp-mirror-editor-operator-color: var(--pink);
+    --jp-mirror-editor-comment-color: var(--text-color-40);
+    --jp-mirror-editor-string-color: var(--deep-orange);
+    --jp-mirror-editor-string-2-color: var(--purple);
+    --jp-mirror-editor-meta-color: var(--md-pink-900);
+    --jp-mirror-editor-qualifier-color: var(--grey);
+    --jp-mirror-editor-builtin-color: var(--md-light-green-900);
+    --jp-mirror-editor-bracket-color: var(--md-lime-400);
+    --jp-mirror-editor-tag-color: var(--md-amber-500);
+    --jp-mirror-editor-attribute-color: var(--md-blue-600);
+    --jp-mirror-editor-header-color: var(--blue);
+    --jp-mirror-editor-quote-color: var(--green);
+    --jp-mirror-editor-link-color: var(--light-blue);
+    --jp-mirror-editor-error-color: var(--red);
+    --jp-mirror-editor-hr-color: var(--md-blue-grey-900);
 }
 
 html {
@@ -51,14 +81,20 @@ html {
 
         --blue-l: 70%;
         --indigo-l: 71%;
+        --deeppurple-l: 77%;
         --purple-l: 80%;
         --pink-l: 83%;
         --red-l: 75%;
+        --deep-orange-l: 74%;
         --orange-l: 74%;
+        --amber-l: 76%;
         --yellow-l: 80%;
-        --green-l: 80%;
+        --lime-l: 66%;
+        --light-green-l: 65%;
+        --green-l: 66%;
         --teal-l: 75%;
         --cyan-l: 80%;
+        --light-blue-l: 80%;
 
         --text-color-h: 213;
         --text-color-s: 32%;
