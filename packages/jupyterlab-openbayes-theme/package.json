@@ -1,6 +1,6 @@
 {
   "name": "jupyterlab-openbayes-theme",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "description": "OpenBayes JupyterLab Theme with auto dark mode support",
   "keywords": [
     "jupyter",
