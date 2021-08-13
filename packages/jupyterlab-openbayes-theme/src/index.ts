@@ -2,7 +2,7 @@
 // Distributed under the terms of the Modified BSD License.
 /**
  * @packageDocumentation
- * @module theme-light-extension
+ * @module jupyterlab-openbayes-theme
  */
 
 import {
