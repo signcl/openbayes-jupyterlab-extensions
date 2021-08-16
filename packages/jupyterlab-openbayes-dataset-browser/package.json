@@ -7,7 +7,7 @@
     "jupyterlab",
     "jupyterlab-extension"
   ],
-  "homepage": "https://openbayes.com/",
+  "homepage": "https://github.com/signcl/openbayes-jupyterlab-extensions",
   "bugs": {
     "url": "https://github.com/signcl/openbayes-jupyterlab-extensions/issues"
   },
