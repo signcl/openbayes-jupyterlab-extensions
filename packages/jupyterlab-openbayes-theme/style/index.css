@@ -49,6 +49,11 @@
 
     --jp-rendermime-error-background: var(--red-10);
 
+    --jp-input-active-box-shadow-color: var(--link-color-30);
+
+    --jp-editor-selected-background: var(--text-color-10);
+    --jp-editor-selected-focused-background: var(--link-color-10);
+
     --jp-mirror-editor-keyword-color: var(--green);
     --jp-mirror-editor-atom-color: var(--deep-purple);
     --jp-mirror-editor-number-color: var(--green);
@@ -76,9 +81,16 @@
 }
 
 html {
+    /* JupyterLab misses default background color */
     background-color: var(--bg-color);
 }
 
+/* Custom overrides for JupyterLab */
+#main-logo {
+    background-color: var(--bg-color);
+}
+
+/* Dark theme support */
 @media (prefers-color-scheme: dark) {
     :root:not([data-color-mode=light]) {
         --theme-scheme-multiplier: -1;
