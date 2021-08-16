@@ -70,8 +70,8 @@ const plugin: JupyterFrontEndPlugin<void> = {
     // End openbayes-jupyterlab-extensions
 
     manager.register({
-      name: 'OpenBayes Theme Next',
-      displayName: trans.__('OpenBayes Theme Next'),
+      name: 'OpenBayes',
+      displayName: trans.__('OpenBayes'),
       isLight: isLight,
       themeScrollbars: false,
       load: () => manager.loadCSS(style),
