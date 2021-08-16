@@ -2,9 +2,21 @@
 
 OpenBayes Theme, a fork from official JupyterLab  [light theme](https://github.com/jupyterlab/jupyterlab/tree/master/packages/theme-light-extension) with auto color scheme support powered by [Kladenets](https://github.com/sparanoid/kladenets) variables.
 
+## Features
+
+- [Remapped Material Colors](https://github.com/sparanoid/kladenets/blob/master/packages/core/dist/kladenets-material-map.css) that more pleasent to the eyes
+- Auto dark theme
+- Refined syntax highlighting colors
+
+## Screenshots
+
+![jupyterlab-openbayes-theme-dark](https://user-images.githubusercontent.com/96356/129545551-453b076d-6bc3-4214-9fbb-877b724e2e81.png)
+
+![jupyterlab-openbayes-theme-light](https://user-images.githubusercontent.com/96356/129545540-30c56d0e-e748-421e-928e-62463ce94e80.png)
+
 ## Prerequisites
 
-* JupyterLab
+* JupyterLab 3.1.0+
 
 ## Installation
 
