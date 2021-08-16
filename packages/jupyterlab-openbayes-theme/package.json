@@ -1,7 +1,7 @@
 {
   "name": "jupyterlab-openbayes-theme",
-  "version": "1.0.4",
-  "description": "OpenBayes JupyterLab Theme with auto dark mode support",
+  "version": "1.0.5",
+  "description": "OpenBayes JupyterLab Theme with auto color scheme support powered by Kladenets",
   "keywords": [
     "jupyter",
     "jupyterlab",
