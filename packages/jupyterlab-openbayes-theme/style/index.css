@@ -90,6 +90,10 @@ html {
     background-color: var(--bg-color);
 }
 
+.CodeMirror-linenumber {
+    color: var(--text-color-50);
+}
+
 /* Dark theme support */
 @media (prefers-color-scheme: dark) {
     :root:not([data-color-mode=light]) {
