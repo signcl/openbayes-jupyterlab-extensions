@@ -8,6 +8,10 @@
 
 :root {
     /* JupyterLab resets */
+    --jp-shadow-umbra-color: var(--link-color-20);
+    --jp-shadow-penumbra-color: var(--link-color-10);
+    --jp-shadow-ambient-color: var(--link-color-5);
+
     --jp-border-color0: var(--text-color-30);
     --jp-border-color1: var(--text-color-20);
     --jp-border-color2: var(--text-color-10);
