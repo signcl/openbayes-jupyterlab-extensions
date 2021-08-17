@@ -28,7 +28,7 @@ General commands:
 jupyter labextension install jupyterlab-openbayes-theme
 ```
 
-See [`packages/`](/tree/master/packages) for details.
+See [`packages/`](packages) for details.
 
 ## Development
 
