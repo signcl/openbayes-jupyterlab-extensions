@@ -4,6 +4,12 @@
 
 OpenBayes snippets
 
+## Features
+
+snippets 补充大量代码片段
+
+- 参考 [colab](https://colab.research.google.com)
+- 参考 [链接](https://jupyter-contrib-nbextensions.readthedocs.io/en/latest/nbextensions/snippets_menu/readme.html)
 
 ## Requirements
 
@@ -52,4 +58,3 @@ jupyter lab --watch
 ```bash
 jupyter labextension uninstall jupyterlab-openbayes-snippets
 ```
-

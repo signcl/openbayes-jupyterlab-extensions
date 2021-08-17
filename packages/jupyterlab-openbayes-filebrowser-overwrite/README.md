@@ -4,6 +4,12 @@
 
 filebrowser overwrite
 
+## Features
+
+拷贝 OpenBayes 容器文件的完整路径
+
+- 添加 menu item 「Copy OpenBayes Path」，拷贝容器内文件 `/openbayes/home/xxx` 的完整路径到系统剪贴板
+- 不移除 「Copy Path」，留给 juypterlab 的其他组件使用
 
 ## Requirements
 
@@ -52,4 +58,3 @@ jupyter lab --watch
 ```bash
 jupyter labextension uninstall jupyterlab-openbayes-filebrowser-overwrite
 ```
-
