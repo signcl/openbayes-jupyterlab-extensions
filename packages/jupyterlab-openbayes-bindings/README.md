@@ -4,6 +4,14 @@
 
 Openbayes Bindings
 
+## Features
+
+数据集绑定
+
+- 模仿 console 的 [JupyterPage.tsx](https://github.com/signcl/openbayes-console/blob/573a48e92e09d7032f36258c095f4912023f2699/src/pages/JupyterPage.tsx) 显示数据集绑定的网页路径和容器内路径
+- 点击网页路径跳到到相应的页面
+- 点击容器内路径，打开终端，并列出前 N 个文件细节
+
 ## Requirements
 
 - JupyterLab >= 1.0

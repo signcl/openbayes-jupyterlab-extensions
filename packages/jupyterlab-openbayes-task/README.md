@@ -4,6 +4,13 @@
 
 OpenBayes Task
 
+## Features
+
+将 notebook 代码保存成 python 文件，并开启新的 task 执行
+
+- 选中 notebook 需要的代码块，并保存到 python 文件中
+- 启动一个新的 task 执行 python 文件
+- 参考 [kubeflow-kale](https://github.com/kubeflow-kale/jupyterlab-kubeflow-kale)
 
 ## Requirements
 
@@ -52,4 +59,3 @@ jupyter lab --watch
 ```bash
 jupyter labextension uninstall jupyterlab-openbayes-task
 ```
-
