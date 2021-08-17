@@ -38,6 +38,9 @@ Requriements:
 - Node.js with Yarn
 
 ```bash
+# Setup dependencies at project root (not package root).
+yarn install
+
 # Start JupyterLab with --watch flag:
 jupyter lab --collaborative --watch
 
