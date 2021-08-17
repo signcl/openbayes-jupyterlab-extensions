@@ -62,7 +62,7 @@
     --jp-mirror-editor-variable-2-color: var(--indigo);
     --jp-mirror-editor-variable-3-color: var(--light-green);
     --jp-mirror-editor-punctuation-color: var(--light-blue);
-    --jp-mirror-editor-property-color: var(--cyan);
+    --jp-mirror-editor-property-color: var(--md-cyan-800);
     --jp-mirror-editor-operator-color: var(--pink);
     --jp-mirror-editor-comment-color: var(--text-color-40);
     --jp-mirror-editor-string-color: var(--deep-orange);
