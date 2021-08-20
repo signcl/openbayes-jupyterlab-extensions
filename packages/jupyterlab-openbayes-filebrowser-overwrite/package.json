@@ -15,7 +15,8 @@
   "author": "openbayes",
   "files": [
     "lib/**/*.{d.ts,eot,gif,html,jpg,js,js.map,json,png,svg,woff2,ttf}",
-    "style/**/*.{css,eot,gif,html,jpg,json,png,svg,woff2,ttf}"
+    "style/**/*.{css,eot,gif,html,jpg,json,png,svg,woff2,ttf}",
+    "style/index.js"
   ],
   "main": "lib/index.js",
   "types": "lib/index.d.ts",
@@ -25,30 +26,32 @@
     "url": "https://github.com/signcl/openbayes-jupyterlab-extensions.git"
   },
   "scripts": {
-    "build": "tsc",
+    "build": "tsc -b",
     "clean": "rimraf lib tsconfig.tsbuildinfo",
     "prepare": "jlpm run clean && jlpm run build",
-    "watch": "tsc -w"
+    "watch": "tsc -b --watch"
   },
   "publishConfig": {
     "access": "public",
     "registry": "https://registry.npmjs.org/"
   },
   "dependencies": {
-    "@jupyterlab/application": "^3.1.5",
-    "@jupyterlab/apputils": "^3.1.5",
-    "@jupyterlab/filebrowser": "^3.1.5",
-    "@jupyterlab/ui-components": "^3.1.5"
+    "@jupyterlab/application": "^3.1.6",
+    "@jupyterlab/apputils": "^3.1.6",
+    "@jupyterlab/filebrowser": "^3.1.6",
+    "@jupyterlab/ui-components": "^3.1.6"
   },
   "devDependencies": {
     "rimraf": "^3.0.2",
     "typescript": "~4.2.3"
   },
   "sideEffects": [
-    "style/*.css"
+    "style/*.css",
+    "style/index.js"
   ],
   "jupyterlab": {
     "extension": true
   },
+  "styleModule": "style/index.js",
   "gitHead": "7b492a17a892d0b12ce38b9cddc00a7f491269db"
 }

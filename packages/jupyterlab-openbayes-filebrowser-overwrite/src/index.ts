@@ -1,77 +1,40 @@
 import {
-  JupyterFrontEnd, JupyterFrontEndPlugin
+  JupyterFrontEnd,
+  JupyterFrontEndPlugin
 } from '@jupyterlab/application';
-
-import {
-  IFileBrowserFactory
-} from '@jupyterlab/filebrowser';
-
-import {
-  Clipboard
-} from '@jupyterlab/apputils';
-
-import {
-  fileIcon
-} from '@jupyterlab/ui-components';
+import { IFileBrowserFactory } from '@jupyterlab/filebrowser';
+import { Clipboard } from '@jupyterlab/apputils';
+import { fileIcon } from '@jupyterlab/ui-components';
 
 namespace CommandIDs {
   export const copyPath = 'filebrowser-overwrite:copy-path';
 }
 
-/**
- * Initialization data for the jupyterlab-openbayes-filebrowser-overwrite extension.
- */
 const extension: JupyterFrontEndPlugin<void> = {
   id: 'jupyterlab-openbayes-filebrowser-overwrite',
   autoStart: true,
   requires: [IFileBrowserFactory],
+  optional: [],
   activate: (app: JupyterFrontEnd, factory: IFileBrowserFactory) => {
     console.log('JupyterLab extension jupyterlab-openbayes-filebrowser-overwrite is activated!');
 
-    addCommands(app, factory);
+    app.commands.addCommand(CommandIDs.copyPath, {
+      label: 'Copy OpenBayes Path',
+      caption: 'Copy file path for OpenBayes specific location',
+      icon: fileIcon.bindprops({stylesheet: 'menuItem'}),
+      execute: () => {
+        const file = factory.tracker.currentWidget.selectedItems().next();
 
-    const selectorItem = '.jp-DirListing-item[data-isdir]';
+        Clipboard.copyToSystem('/openbayes/' + file.path);
+      },
+    });
 
     app.contextMenu.addItem({
       command: CommandIDs.copyPath,
-      selector: selectorItem,
-      rank: 12
+      selector: '.jp-DirListing-item[data-isdir]',
+      rank: 14
     });
-
   }
 };
-
-function addCommands(
-  app: JupyterFrontEnd,
-  factory: IFileBrowserFactory,
-): void {
-  const {commands} = app;
-  const {tracker} = factory;
-
-  console.log(tracker)
-
-  commands.addCommand(CommandIDs.copyPath, {
-    execute: () => {
-
-      const widget = tracker.currentWidget;
-      if (!widget) {
-        return;
-      }
-
-      const item = widget.selectedItems().next();
-      if (!item) {
-        return;
-      }
-
-      Clipboard.copyToSystem("/openbayes/" + item.path);
-
-    },
-    isVisible: () =>
-        !!tracker.currentWidget &&
-        tracker.currentWidget.selectedItems().next !== undefined,
-    icon: fileIcon.bindprops({stylesheet: 'menuItem'}),
-    label: 'Copy OpenBayes Path'
-  });
-}
 
 export default extension;
