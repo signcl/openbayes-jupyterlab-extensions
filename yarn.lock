@@ -4315,10 +4315,10 @@ kind-of@^6.0.2, kind-of@^6.0.3:
   resolved "https://registry.yarnpkg.com/kind-of/-/kind-of-6.0.3.tgz#07c05034a6c349fa06e24fa35aa76db4580ce4dd"
   integrity sha512-dcS1ul+9tmeD95T+x28/ehLgd9mENa3LsvDTtzm3vyBEO7RPptvAD+t44WVXaUjTBRcrpFeFlC8WCruUR456hw==
 
-kladenets@^2.0.0-8:
-  version "2.0.0-8"
-  resolved "https://registry.yarnpkg.com/kladenets/-/kladenets-2.0.0-8.tgz#fe364cd1181f3aa40ab602117382d2934e87bd8c"
-  integrity sha512-VXwumksThnAw9FRl0qOJ5+GBSyxPKv7gsxzJBTfFmJq14eWi+b+gWlen+qrO5PExsw8SeKrTw4lvgl7ufcWGTw==
+kladenets@^2.0.0-12:
+  version "2.0.0-12"
+  resolved "https://registry.yarnpkg.com/kladenets/-/kladenets-2.0.0-12.tgz#0f1fc29352bd3be5e99ef4960fece29d084030bd"
+  integrity sha512-qeSXbzK+B9qpy1kclFaW9qaPxvnZ90FJBSMzYMz81KpgPoPyFc+V9LaeiFWO3iwtDhfli78F9EWhCoy+PQdJjw==
 
 klona@^2.0.3:
   version "2.0.4"
