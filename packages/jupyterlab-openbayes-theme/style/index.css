@@ -4,7 +4,7 @@
 */
 @import '~@jupyterlab/theme-light-extension/style/theme.css';
 @import '~kladenets';
-@import '~kladenets/dist/kladenets-material-map.css';
+@import '~kladenets/dist/plugin/material-map.css';
 
 :root {
     /* JupyterLab resets */
