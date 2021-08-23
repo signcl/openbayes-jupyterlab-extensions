@@ -1,6 +1,6 @@
 {
   "name": "jupyterlab-openbayes-theme",
-  "version": "1.0.5",
+  "version": "1.0.6",
   "description": "OpenBayes JupyterLab Theme with auto color scheme support powered by Kladenets",
   "keywords": [
     "jupyter",
