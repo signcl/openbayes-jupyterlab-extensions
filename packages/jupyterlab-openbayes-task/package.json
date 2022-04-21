@@ -50,7 +50,7 @@
     "@types/react-dom": "^16.9.5"
   },
   "devDependencies": {
-    "rimraf": "^2.6.1",
+    "rimraf": "^3.0.2",
     "typescript": "^3.6.5"
   },
   "sideEffects": [
