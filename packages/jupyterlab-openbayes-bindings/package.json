@@ -43,7 +43,7 @@
     "@jupyterlab/ui-components": "^2.0.2",
     "@lumino/algorithm": "^1.2.3",
     "@lumino/widgets": "^1.11.1",
-    "@types/react-dom": "^16.9.5"
+    "@types/react-dom": "^18.0.1"
   },
   "devDependencies": {
     "rimraf": "~3.0.0",
