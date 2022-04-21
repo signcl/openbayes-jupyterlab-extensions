@@ -9,38 +9,3 @@ updates:
     directory: "/"
     schedule:
       interval: "daily"
-
-  - package-ecosystem: "npm"
-    directory: "/packages/jupyterlab-openbayes-bindings"
-    schedule:
-      interval: "daily"
-
-  - package-ecosystem: "npm"
-    directory: "/packages/jupyterlab-openbayes-dataset-browser"
-    schedule:
-      interval: "daily"
-
-  - package-ecosystem: "npm"
-    directory: "/packages/jupyterlab-openbayes-filebrowser-overwrite"
-    schedule:
-      interval: "daily"
-
-  - package-ecosystem: "npm"
-    directory: "/packages/jupyterlab-openbayes-introduction"
-    schedule:
-      interval: "daily"
-
-  - package-ecosystem: "npm"
-    directory: "/packages/jupyterlab-openbayes-snippets"
-    schedule:
-      interval: "daily"
-
-  - package-ecosystem: "npm"
-    directory: "/packages/jupyterlab-openbayes-task"
-    schedule:
-      interval: "daily"
-
-  - package-ecosystem: "npm"
-    directory: "/packages/jupyterlab-openbayes-theme"
-    schedule:
-      interval: "daily"
