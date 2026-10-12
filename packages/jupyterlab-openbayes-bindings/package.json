@@ -38,7 +38,7 @@
     "@jupyterlab/application": "^2.0.2",
     "@jupyterlab/apputils": "^2.0.2",
     "@jupyterlab/running": "^2.0.2",
-    "@jupyterlab/services": "^5.0.2",
+    "@jupyterlab/services": "^6.3.4",
     "@jupyterlab/terminal": "^2.0.2",
     "@jupyterlab/ui-components": "^2.0.2",
     "@lumino/algorithm": "^1.2.3",
